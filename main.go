@@ -8,7 +8,7 @@ import (
 	"debtomate/utils/viper"
 	"github.com/gofiber/fiber/v2"
 	"log"
-	"strconv"
+	"os"
 )
 
 func main() {
@@ -27,17 +27,20 @@ func main() {
 	}
 	database.Migrate(db)
 
-	jwtService := token.NewJWT(viper.ViperConfig.GetStringValue("app.SECRET"))
+	jwtService := token.NewJWT(viper.ViperConfig.GetStringValue("SECRET"))
 
 	route.SetupRoutes(app, db, jwtService)
 
-	port := viper.ViperConfig.GetPort()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000"
+	}
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, DebtoMate")
+		return c.SendString("Hello, Ruti Store")
 	})
 
-	err = app.Listen(":" + strconv.Itoa(port))
+	err = app.Listen(":" + port)
 	if err != nil {
 		log.Fatalf("Failed to start the server: %s", err)
 	}

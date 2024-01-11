@@ -16,13 +16,14 @@ type Config struct{}
 
 // LoadConfig load configuration file
 func (c *Config) LoadConfig() error {
-	viper.SetConfigFile("./config.json")
-	viper.SetConfigType("json")
+	viper.SetConfigFile(".env")
 
-	err := viper.ReadInConfig()
-	if err != nil {
+	if err := viper.ReadInConfig(); err != nil {
 		return err
 	}
+
+	viper.AutomaticEnv()
+
 	return nil
 }
 
@@ -34,14 +35,6 @@ func (c *Config) GetStringValue(key string) string {
 func (c *Config) GetIntValue(key string) int {
 	value := viper.GetInt(key)
 	return value
-}
-
-func (c *Config) GetPort() int {
-	port := viper.GetInt("PORT")
-	if port == 0 {
-		port = 8000
-	}
-	return port
 }
 
 var ViperConfig = &Config{}
