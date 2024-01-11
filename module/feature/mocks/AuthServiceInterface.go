@@ -3,7 +3,8 @@
 package mocks
 
 import (
-	entities "debtomate/module/entities"
+	entities "ruti-store/module/entities"
+	domain "ruti-store/module/feature/auth/domain"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -14,20 +15,20 @@ type AuthServiceInterface struct {
 }
 
 // Login provides a mock function with given fields: email, password
-func (_m *AuthServiceInterface) Login(email string, password string) (*entities.AdminModels, string, error) {
+func (_m *AuthServiceInterface) Login(email string, password string) (*entities.UserModels, string, error) {
 	ret := _m.Called(email, password)
 
-	var r0 *entities.AdminModels
+	var r0 *entities.UserModels
 	var r1 string
 	var r2 error
-	if rf, ok := ret.Get(0).(func(string, string) (*entities.AdminModels, string, error)); ok {
+	if rf, ok := ret.Get(0).(func(string, string) (*entities.UserModels, string, error)); ok {
 		return rf(email, password)
 	}
-	if rf, ok := ret.Get(0).(func(string, string) *entities.AdminModels); ok {
+	if rf, ok := ret.Get(0).(func(string, string) *entities.UserModels); ok {
 		r0 = rf(email, password)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.AdminModels)
+			r0 = ret.Get(0).(*entities.UserModels)
 		}
 	}
 
@@ -44,6 +45,32 @@ func (_m *AuthServiceInterface) Login(email string, password string) (*entities.
 	}
 
 	return r0, r1, r2
+}
+
+// Register provides a mock function with given fields: req
+func (_m *AuthServiceInterface) Register(req *domain.RegisterRequest) (*entities.UserModels, error) {
+	ret := _m.Called(req)
+
+	var r0 *entities.UserModels
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*domain.RegisterRequest) (*entities.UserModels, error)); ok {
+		return rf(req)
+	}
+	if rf, ok := ret.Get(0).(func(*domain.RegisterRequest) *entities.UserModels); ok {
+		r0 = rf(req)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entities.UserModels)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*domain.RegisterRequest) error); ok {
+		r1 = rf(req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // NewAuthServiceInterface creates a new instance of AuthServiceInterface. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

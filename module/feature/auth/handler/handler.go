@@ -20,7 +20,7 @@ func NewAuthHandler(service domain.AuthServiceInterface) domain.AuthHandlerInter
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	req := new(domain.LoginRequest)
 	if err := c.BodyParser(req); err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "err")
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Failed to parse request body")
 	}
 
 	if err := validator.ValidateStruct(req); err != nil {
@@ -29,8 +29,25 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 
 	user, token, err := h.service.Login(req.Email, req.Password)
 	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Status internal server error: "+err.Error())
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
 	return response.SuccessBuildResponse(c, fiber.StatusOK, "Login successfully", domain.LoginFormatter(user, token))
+}
+
+func (h *AuthHandler) Register(c *fiber.Ctx) error {
+	req := new(domain.RegisterRequest)
+	if err := c.BodyParser(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Failed to parse request body")
+	}
+
+	if err := validator.ValidateStruct(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	result, err := h.service.Register(req)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+	return response.SuccessBuildResponse(c, fiber.StatusCreated, "Registration successful", domain.RegisterFormatter(result))
 }
