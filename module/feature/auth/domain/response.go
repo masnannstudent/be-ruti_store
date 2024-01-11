@@ -1,6 +1,6 @@
 package domain
 
-import "debtomate/module/entities"
+import "ruti-store/module/entities"
 
 type UserResponse struct {
 	Name  string `json:"name"`

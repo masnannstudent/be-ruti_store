@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"debtomate/utils/response"
-	"debtomate/utils/token"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
+	"ruti-store/utils/response"
+	"ruti-store/utils/token"
 	"strings"
 )
 
@@ -35,4 +35,3 @@ func Auth(jwtService token.JWTInterface) fiber.Handler {
 		return c.Next()
 	}
 }
-
