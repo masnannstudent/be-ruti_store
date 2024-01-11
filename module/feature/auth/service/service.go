@@ -45,3 +45,29 @@ func (s *AuthService) Login(email, password string) (*entities.UserModels, strin
 
 	return user, accessToken, nil
 }
+
+func (s *AuthService) Register(req *domain.RegisterRequest) (*entities.UserModels, error) {
+	user, _ := s.repo.GetUsersByEmail(req.Email)
+	if user != nil {
+		return nil, errors.New("email already exists")
+	}
+
+	hashPassword, err := s.hash.GenerateHash(req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	value := &entities.UserModels{
+		Email:    req.Email,
+		Password: hashPassword,
+		Name:     req.Name,
+		Phone:    req.Phone,
+		Role:     "customer",
+	}
+
+	result, err := s.repo.CreateUser(value)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
