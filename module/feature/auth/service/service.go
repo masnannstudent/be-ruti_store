@@ -1,11 +1,11 @@
 package service
 
 import (
-	"debtomate/module/entities"
-	"debtomate/module/feature/auth/domain"
-	"debtomate/utils/hash"
-	"debtomate/utils/token"
 	"errors"
+	"ruti-store/module/entities"
+	"ruti-store/module/feature/auth/domain"
+	"ruti-store/utils/hash"
+	"ruti-store/utils/token"
 )
 
 type AuthService struct {
@@ -38,7 +38,7 @@ func (s *AuthService) Login(email, password string) (*entities.UserModels, strin
 		return nil, "", errors.New("wrong credential")
 	}
 
-	accessToken, err := s.jwt.GenerateJWT(user.ID, user.Email)
+	accessToken, err := s.jwt.GenerateJWT(user.ID, user.Email, user.Role)
 	if err != nil {
 		return nil, "", err
 	}
