@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	entities "debtomate/module/entities"
+	entities "ruti-store/module/entities"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -13,20 +13,46 @@ type AuthRepositoryInterface struct {
 	mock.Mock
 }
 
+// CreateUser provides a mock function with given fields: req
+func (_m *AuthRepositoryInterface) CreateUser(req *entities.UserModels) (*entities.UserModels, error) {
+	ret := _m.Called(req)
+
+	var r0 *entities.UserModels
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*entities.UserModels) (*entities.UserModels, error)); ok {
+		return rf(req)
+	}
+	if rf, ok := ret.Get(0).(func(*entities.UserModels) *entities.UserModels); ok {
+		r0 = rf(req)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entities.UserModels)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*entities.UserModels) error); ok {
+		r1 = rf(req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetUsersByEmail provides a mock function with given fields: email
-func (_m *AuthRepositoryInterface) GetUsersByEmail(email string) (*entities.AdminModels, error) {
+func (_m *AuthRepositoryInterface) GetUsersByEmail(email string) (*entities.UserModels, error) {
 	ret := _m.Called(email)
 
-	var r0 *entities.AdminModels
+	var r0 *entities.UserModels
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (*entities.AdminModels, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (*entities.UserModels, error)); ok {
 		return rf(email)
 	}
-	if rf, ok := ret.Get(0).(func(string) *entities.AdminModels); ok {
+	if rf, ok := ret.Get(0).(func(string) *entities.UserModels); ok {
 		r0 = rf(email)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.AdminModels)
+			r0 = ret.Get(0).(*entities.UserModels)
 		}
 	}
 

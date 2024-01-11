@@ -1,12 +1,12 @@
 package service
 
 import (
-	"debtomate/module/entities"
-	"debtomate/module/feature/auth/domain"
-	"debtomate/module/feature/auth/mocks"
-	utils "debtomate/utils/mocks"
 	"errors"
 	"github.com/stretchr/testify/assert"
+	"ruti-store/module/entities"
+	"ruti-store/module/feature/auth/domain"
+	"ruti-store/module/feature/mocks"
+	utils "ruti-store/utils/mocks"
 
 	"testing"
 )
@@ -25,16 +25,17 @@ func TestLogin(t *testing.T) {
 
 	t.Run("Success Case - Valid Credentials", func(t *testing.T) {
 		repo, service, hash, jwt := setupTest(t)
-		expectedUser := &entities.AdminModels{
+		expectedUser := &entities.UserModels{
 			ID:       1,
 			Email:    email,
 			Password: "hashedPassword",
+			Role:     "customer",
 		}
 		expectedToken := "mockedAccessToken"
 
 		repo.On("GetUsersByEmail", email).Return(expectedUser, nil)
 		hash.On("ComparePassword", expectedUser.Password, password).Return(true, nil)
-		jwt.On("GenerateJWT", expectedUser.ID, expectedUser.Email).Return(expectedToken, nil)
+		jwt.On("GenerateJWT", expectedUser.ID, expectedUser.Email, expectedUser.Role).Return(expectedToken, nil)
 
 		user, accessToken, err := service.Login(email, password)
 
@@ -67,7 +68,7 @@ func TestLogin(t *testing.T) {
 
 	t.Run("Error Case - Invalid Credentials", func(t *testing.T) {
 		repo, service, hash, jwt := setupTest(t)
-		expectedUser := &entities.AdminModels{
+		expectedUser := &entities.UserModels{
 			ID:       1,
 			Email:    email,
 			Password: "hashedPassword",
@@ -90,7 +91,7 @@ func TestLogin(t *testing.T) {
 
 	t.Run("Error Case - JWT Generation Failure", func(t *testing.T) {
 		repo, service, hash, jwt := setupTest(t)
-		expectedUser := &entities.AdminModels{
+		expectedUser := &entities.UserModels{
 			ID:       1,
 			Email:    email,
 			Password: "hashedPassword",
@@ -99,7 +100,7 @@ func TestLogin(t *testing.T) {
 
 		hash.On("ComparePassword", expectedUser.Password, password).Return(true, nil)
 
-		jwt.On("GenerateJWT", expectedUser.ID, expectedUser.Email).Return("", errors.New("jwt generation failed"))
+		jwt.On("GenerateJWT", expectedUser.ID, expectedUser.Email, expectedUser.Role).Return("", errors.New("jwt generation failed"))
 
 		user, accessToken, err := service.Login(email, password)
 

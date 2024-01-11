@@ -23,3 +23,10 @@ func (r *AuthRepository) GetUsersByEmail(email string) (*entities.UserModels, er
 	}
 	return &user, nil
 }
+
+func (r *AuthRepository) CreateUser(req *entities.UserModels) (*entities.UserModels, error) {
+	if err := r.db.Create(req).Error; err != nil {
+		return nil, err
+	}
+	return req, nil
+}
