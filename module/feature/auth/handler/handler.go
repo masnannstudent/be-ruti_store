@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"debtomate/module/feature/auth/domain"
-	"debtomate/utils/response"
-	"debtomate/utils/validator"
 	"github.com/gofiber/fiber/v2"
+	"ruti-store/module/feature/auth/domain"
+	"ruti-store/utils/response"
+	"ruti-store/utils/validator"
 )
 
 type AuthHandler struct {

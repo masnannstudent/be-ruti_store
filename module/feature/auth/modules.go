@@ -1,15 +1,15 @@
 package auth
 
 import (
-	"debtomate/module/feature/auth/domain"
-	"debtomate/module/feature/auth/handler"
-	"debtomate/module/feature/auth/repository"
-	"debtomate/module/feature/auth/service"
-	utils "debtomate/utils/hash"
-	"debtomate/utils/token"
-	"debtomate/utils/viper"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"os"
+	"ruti-store/module/feature/auth/domain"
+	"ruti-store/module/feature/auth/handler"
+	"ruti-store/module/feature/auth/repository"
+	"ruti-store/module/feature/auth/service"
+	utils "ruti-store/utils/hash"
+	"ruti-store/utils/token"
 )
 
 var (
@@ -21,7 +21,7 @@ var (
 )
 
 func InitializeAuth(db *gorm.DB) {
-	secret := viper.ViperConfig.GetStringValue("app.SECRET")
+	secret := os.Getenv("SECRET")
 	hash = utils.NewHash()
 	jwt = token.NewJWT(secret)
 

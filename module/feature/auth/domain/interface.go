@@ -1,8 +1,8 @@
 package domain
 
 import (
-	"debtomate/module/entities"
 	"github.com/gofiber/fiber/v2"
+	"ruti-store/module/entities"
 )
 
 type AuthRepositoryInterface interface {

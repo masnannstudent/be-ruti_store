@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"debtomate/module/entities"
-	"debtomate/module/feature/auth/domain"
 	"gorm.io/gorm"
+	"ruti-store/module/entities"
+	"ruti-store/module/feature/auth/domain"
 )
 
 type AuthRepository struct {

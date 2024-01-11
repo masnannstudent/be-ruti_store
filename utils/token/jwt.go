@@ -6,7 +6,7 @@ import (
 )
 
 type JWTInterface interface {
-	GenerateJWT(userID uint64, email string) (string, error)
+	GenerateJWT(userID uint64, email, role string) (string, error)
 	ValidateToken(tokenString string) (*jwt.Token, error)
 }
 
@@ -20,10 +20,11 @@ func NewJWT(secret string) JWTInterface {
 	}
 }
 
-func (j *JWT) GenerateJWT(userID uint64, email string) (string, error) {
+func (j *JWT) GenerateJWT(userID uint64, email, role string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
 		"email":   email,
+		"role":    role,
 		"iat":     time.Now().Unix(),
 		"exp":     time.Now().Add(time.Hour * 72).Unix(),
 	}

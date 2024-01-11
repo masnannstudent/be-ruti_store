@@ -1,47 +1,36 @@
 package main
 
 import (
-	"debtomate/module/feature/middleware"
-	"debtomate/module/feature/route"
-	"debtomate/utils/database"
-	"debtomate/utils/token"
-	"debtomate/utils/viper"
 	"github.com/gofiber/fiber/v2"
-	"log"
 	"os"
+	"ruti-store/config"
+	"ruti-store/module/feature/middleware"
+	"ruti-store/module/feature/route"
+	"ruti-store/utils/database"
+	"ruti-store/utils/token"
 )
 
 func main() {
 	app := fiber.New()
+	var initConfig = config.InitConfig()
+	jwtService := token.NewJWT(initConfig.Secret)
 
 	middleware.SetupMiddlewares(app)
-
-	err := viper.ViperConfig.LoadConfig()
-	if err != nil {
-		log.Fatalf("Failed to load configuration: %s", err)
-	}
-
-	db, err := database.InitPGSDatabase()
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %s", err)
-	}
+	db := database.InitPGSDatabase(*initConfig)
 	database.Migrate(db)
-
-	jwtService := token.NewJWT(viper.ViperConfig.GetStringValue("SECRET"))
-
 	route.SetupRoutes(app, db, jwtService)
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8000"
-	}
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, Ruti Store")
 	})
 
-	err = app.Listen(":" + port)
-	if err != nil {
-		log.Fatalf("Failed to start the server: %s", err)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000"
 	}
+	err := app.Listen(":" + port)
+	if err != nil {
+		panic("Failed to start the server: " + err.Error())
+	}
+
 }

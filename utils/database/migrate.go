@@ -1,8 +1,8 @@
 package database
 
 import (
-	"debtomate/module/entities"
 	"gorm.io/gorm"
+	"ruti-store/module/entities"
 )
 
 func Migrate(db *gorm.DB) {

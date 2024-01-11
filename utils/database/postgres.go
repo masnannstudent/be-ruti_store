@@ -1,24 +1,26 @@
 package database
 
 import (
-	"debtomate/utils/viper"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"os"
+	"ruti-store/config"
 )
 
-func InitPGSDatabase() (*gorm.DB, error) {
-	connection := viper.ViperConfig.GetStringValue("DATABASE_URL")
+func InitPGSDatabase(config config.Config) *gorm.DB {
+	connection := os.Getenv("DATABASE_URL")
+
 	db, err := gorm.Open(postgres.Open(connection), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
+		panic("failed to connect to database")
 	}
 
-	// Check the connection
-	if err := db.Exec("SELECT 1").Error; err != nil {
-		return nil, fmt.Errorf("failed to ping database: %w", err)
+	err = db.Raw("SELECT 1").Error
+	if err != nil {
+		panic("failed to ping database")
 	}
 
-	fmt.Println("Connected to PostgresSQL!")
-	return db, nil
+	fmt.Println("Connected to PostgreSQL!")
+	return db
 }
