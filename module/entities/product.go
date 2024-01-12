@@ -5,7 +5,7 @@ import "time"
 type ProductModels struct {
 	ID           uint64               `gorm:"column:id;primaryKey" json:"id"`
 	Name         string               `gorm:"column:name" json:"name"`
-	Price        float64              `gorm:"column:price" json:"price"`
+	Price        uint64               `gorm:"column:price" json:"price"`
 	Description  string               `gorm:"column:description" json:"description"`
 	Rating       float64              `gorm:"column:rating" json:"rating"`
 	TotalReviews uint64               `gorm:"column:total_reviews" json:"total_reviews"`
