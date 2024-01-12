@@ -5,7 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/auth/domain"
-	"ruti-store/module/feature/mocks"
+	"ruti-store/module/feature/auth/mocks"
 	utils "ruti-store/utils/mocks"
 
 	"testing"
