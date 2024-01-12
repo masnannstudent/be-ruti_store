@@ -7,6 +7,7 @@ type ProductModels struct {
 	Name         string               `gorm:"column:name" json:"name"`
 	Price        uint64               `gorm:"column:price" json:"price"`
 	Description  string               `gorm:"column:description" json:"description"`
+	Discount     uint64               `gorm:"column:discount" json:"discount"`
 	Rating       float64              `gorm:"column:rating" json:"rating"`
 	TotalReviews uint64               `gorm:"column:total_reviews" json:"total_reviews"`
 	Stock        uint64               `gorm:"column:stock" json:"stock"`

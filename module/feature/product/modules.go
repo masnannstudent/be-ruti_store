@@ -15,13 +15,14 @@ var (
 	hand domain.ProductHandlerInterface
 )
 
-func InitializeAuth(db *gorm.DB) {
+func InitializeProduct(db *gorm.DB) {
 	repo = repository.NewProductRepository(db)
 	serv = service.NewProductService(repo)
 	hand = handler.NewProductHandler(serv)
 }
 
-func SetupRoutesAuth(app *fiber.App) {
+func SetupRoutesProduct(app *fiber.App) {
 	api := app.Group("/api/v1/product")
 	api.Get("", hand.GetAllProducts)
+	api.Get("/:id", hand.GetProductByID)
 }

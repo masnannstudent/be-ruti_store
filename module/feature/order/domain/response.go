@@ -242,3 +242,10 @@ func ResponseArrayPaymentSummary(data []*entities.OrderModels) []*PaymentSummary
 
 	return res
 }
+
+type CreateOrderResponse struct {
+	OrderID         string `json:"order_id"`
+	IdOrder         string `json:"id_order"`
+	RedirectURL     string `json:"redirect_url"`
+	TotalAmountPaid uint64 `json:"total_amount_paid"`
+}

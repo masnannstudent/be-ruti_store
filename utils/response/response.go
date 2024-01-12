@@ -41,6 +41,13 @@ func ErrorBuildResponse(c *fiber.Ctx, statusCode int, message string) error {
 	return c.Status(statusCode).JSON(response)
 }
 
+func SuccessBuildWithoutResponse(c *fiber.Ctx, statusCode int, message string) error {
+	response := ErrorResponse{
+		Message: message,
+	}
+	return c.Status(statusCode).JSON(response)
+}
+
 func PaginationBuildResponse(c *fiber.Ctx, statusCode int, message string, data interface{}, currentPage, totalItems, totalPages, nextPage, prevPage int) error {
 	pagination := PaginationResponse{
 		CurrentPage: currentPage,
