@@ -5,6 +5,7 @@ import (
 	"github.com/midtrans/midtrans-go/coreapi"
 	"github.com/midtrans/midtrans-go/snap"
 	"gorm.io/gorm"
+	"ruti-store/module/feature/address"
 	"ruti-store/module/feature/auth"
 	"ruti-store/module/feature/order"
 	"ruti-store/module/feature/product"
@@ -20,4 +21,6 @@ func SetupRoutes(app *fiber.App, db *gorm.DB, jwt token.JWTInterface,
 	product.SetupRoutesProduct(app)
 	order.InitializeOrder(db, snapClient, coreClient)
 	order.SetupOrderRoutes(app, jwt, userService)
+	address.InitializeAddress(db)
+	address.SetupRoutesAddress(app, jwt, userService)
 }

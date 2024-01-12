@@ -24,3 +24,27 @@ func (r *AddressRepository) GetAddressByID(addressID uint64) (*entities.AddressM
 	}
 	return address, nil
 }
+
+func (r *AddressRepository) GetTotalItems(userID uint64) (int64, error) {
+	var totalItems int64
+
+	if err := r.db.Model(&entities.AddressModels{}).Where("user_id = ? AND deleted_at IS NULL", userID).Count(&totalItems).Error; err != nil {
+		return 0, err
+	}
+
+	return totalItems, nil
+}
+
+func (r *AddressRepository) GetPaginatedAddresses(userID uint64, page, pageSize int) ([]*entities.AddressModels, error) {
+	var addresses []*entities.AddressModels
+	offset := (page - 1) * pageSize
+	err := r.db.Where("user_id = ? AND deleted_at IS NULL", userID).
+		Limit(pageSize).
+		Offset(offset).
+		Find(&addresses).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return addresses, nil
+}
