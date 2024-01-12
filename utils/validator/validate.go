@@ -13,7 +13,6 @@ var validate = validator.New()
 func ValidateStruct(s interface{}) error {
 	validate := validator.New()
 
-	// Custom validation: password tidak boleh mengandung spasi
 	validate.RegisterValidation("noSpace", func(fl validator.FieldLevel) bool {
 		password := fl.Field().String()
 		return !regexp.MustCompile(`\s`).MatchString(password)
