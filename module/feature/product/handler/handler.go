@@ -41,3 +41,18 @@ func (h *ProductHandler) GetAllProducts(c *fiber.Ctx) error {
 	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
 		domain.ResponseArrayProducts(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
 }
+
+func (h *ProductHandler) GetProductByID(c *fiber.Ctx) error {
+	id := c.Params("id")
+	productID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	result, err := h.service.GetProductByID(productID)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve product: "+err.Error())
+	}
+
+	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved product by ID", result)
+}

@@ -78,26 +78,26 @@ func (s *OrderService) GetOrdersPage(currentPage, pageSize int) (int, int, int, 
 func (s *OrderService) CreateOrder(userID uint64, request *domain.CreateOrderRequest) (*domain.CreateOrderResponse, error) {
 	orderID, err := s.generatorID.GenerateUUID()
 	if err != nil {
-		return nil, errors.New("gagal membuat id pesanan")
+		return nil, errors.New("failed to generate order ID")
 	}
 
 	idOrder, err := s.generatorID.GenerateOrderID()
 	if err != nil {
-		return nil, errors.New("gagal membuat id_order")
+		return nil, errors.New("failed to generate order ID")
 	}
 
 	addresses, err := s.addressService.GetAddressByID(request.AddressID)
 	if err != nil {
-		return nil, errors.New("alamat tidak ditemukan")
+		return nil, errors.New("address not found")
 	}
 
 	products, err := s.productService.GetProductByID(request.ProductID)
 	if err != nil {
-		return nil, errors.New("produk tidak ditemukan")
+		return nil, errors.New("product not found")
 	}
 
 	if products.Stock < request.Quantity {
-		return nil, errors.New("stok tidak mencukupi untuk pesanan ini")
+		return nil, errors.New("insufficient stock for this order")
 	}
 
 	var orderDetails []entities.OrderDetailsModels
@@ -144,7 +144,7 @@ func (s *OrderService) CreateOrder(userID uint64, request *domain.CreateOrderReq
 
 	user, err := s.userService.GetUserByID(createdOrder.UserID)
 	if err != nil {
-		return nil, errors.New("pengguna tidak ditemukan")
+		return nil, errors.New("user not found")
 	}
 
 	snapResult, err := s.repo.CreateSnap(createdOrder.ID, user.Name, user.Email, createdOrder.TotalAmountPaid)
@@ -221,7 +221,7 @@ func (s *OrderService) CancelPayment(orderID string) error {
 	orders.PaymentStatus = "Gagal"
 
 	if err := s.repo.UpdatePayment(orderID, orders.OrderStatus, orders.PaymentStatus); err != nil {
-		return errors.New("gagal membatalkan pesanan")
+		return err
 	}
 
 	return nil
