@@ -19,4 +19,5 @@ type ProductServiceInterface interface {
 
 type ProductHandlerInterface interface {
 	GetAllProducts(c *fiber.Ctx) error
+	GetProductByID(c *fiber.Ctx) error
 }
