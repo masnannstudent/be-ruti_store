@@ -2,7 +2,16 @@ package order
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/midtrans/midtrans-go/coreapi"
+	"github.com/midtrans/midtrans-go/snap"
 	"gorm.io/gorm"
+	"ruti-store/module/feature/middleware"
+	"ruti-store/utils/token"
+
+	address "ruti-store/module/feature/address/domain"
+	addressRepository "ruti-store/module/feature/address/repository"
+	addressService "ruti-store/module/feature/address/service"
+
 	"ruti-store/module/feature/order/domain"
 	"ruti-store/module/feature/order/handler"
 	"ruti-store/module/feature/order/repository"
@@ -10,6 +19,9 @@ import (
 	product "ruti-store/module/feature/product/domain"
 	productRepository "ruti-store/module/feature/product/repository"
 	productService "ruti-store/module/feature/product/service"
+	user "ruti-store/module/feature/user/domain"
+	userRepository "ruti-store/module/feature/user/repository"
+	userService "ruti-store/module/feature/user/service"
 	generator2 "ruti-store/utils/generator"
 )
 
@@ -20,20 +32,30 @@ var (
 	productRepo   product.ProductRepositoryInterface
 	productServ   product.ProductServiceInterface
 	uuidGenerator generator2.GeneratorInterface
+	addressRepo   address.AddressRepositoryInterface
+	addressServ   address.AddressServiceInterface
+	userRepo      user.UserRepositoryInterface
+	userServ      user.UserServiceInterface
 )
 
-func InitializeOrder(db *gorm.DB) {
+func InitializeOrder(db *gorm.DB, snapClient snap.Client, coreClient coreapi.Client) {
 	productRepo = productRepository.NewProductRepository(db)
 	productServ = productService.NewProductService(productRepo)
 	uuidGenerator = generator2.NewGeneratorUUID(db)
+	addressRepo = addressRepository.NewAddressRepository(db)
+	addressServ = addressService.NewAddressService(addressRepo)
+	userRepo = userRepository.NewUserRepository(db)
+	userServ = userService.NewUserService(userRepo)
 
-	orderRepo = repository.NewOrderRepository(db)
-	orderServ = service.NewOrderService(orderRepo, uuidGenerator, productServ)
+	orderRepo = repository.NewOrderRepository(db, snapClient, coreClient)
+	orderServ = service.NewOrderService(orderRepo, uuidGenerator, productServ, addressServ, userServ)
 	orderHand = handler.NewOrderHandler(orderServ)
 }
 
-func SetupOrderRoutes(app *fiber.App) {
-	api := app.Group("/api/v1/orders")
-	api.Get("", orderHand.GetAllOrders)
-	api.Get("/payment", orderHand.GetAllPayment)
+func SetupOrderRoutes(app *fiber.App, jwt token.JWTInterface, userService user.UserServiceInterface) {
+	api := app.Group("/api/v1/order")
+	api.Get("/payment", middleware.AuthMiddleware(jwt, userService), orderHand.GetAllPayment)
+	api.Get("", middleware.AuthMiddleware(jwt, userService), orderHand.GetAllOrders)
+	api.Post("/create", middleware.AuthMiddleware(jwt, userService), orderHand.CreateOrder)
+	api.Post("/callback", orderHand.Callback)
 }

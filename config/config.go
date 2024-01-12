@@ -12,6 +12,8 @@ type Config struct {
 	ServerPort  int
 	DatabaseUrl string
 	Secret      string
+	ServerKey   string
+	ClientKey   string
 }
 
 func InitConfig() *Config {
@@ -45,6 +47,14 @@ func loadConfig() *Config {
 
 	if val, found := os.LookupEnv("SECRET"); found {
 		res.Secret = val
+	}
+
+	if val, found := os.LookupEnv("SERVERKEY"); found {
+		res.ServerKey = val
+	}
+
+	if val, found := os.LookupEnv("CLIENTKEY"); found {
+		res.ClientKey = val
 	}
 
 	return res
