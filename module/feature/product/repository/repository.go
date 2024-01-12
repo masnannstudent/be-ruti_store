@@ -19,7 +19,7 @@ func NewProductRepository(db *gorm.DB) domain.ProductRepositoryInterface {
 func (r *ProductRepository) GetTotalItems() (int64, error) {
 	var totalItems int64
 
-	if err := r.db.Model(&entities.ProductModels{}).Count(&totalItems).Error; err != nil {
+	if err := r.db.Model(&entities.ProductModels{}).Count(&totalItems).Where("deleted_at IS NULL").Error; err != nil {
 		return 0, err
 	}
 
@@ -31,7 +31,7 @@ func (r *ProductRepository) GetPaginatedProducts(page, pageSize int) ([]*entitie
 
 	offset := (page - 1) * pageSize
 
-	if err := r.db.Offset(offset).Limit(pageSize).Preload("Photos").Find(&products).Error; err != nil {
+	if err := r.db.Offset(offset).Limit(pageSize).Preload("Photos").Find(&products).Where("deleted_at IS NULL").Error; err != nil {
 		return nil, err
 	}
 
