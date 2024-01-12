@@ -7,7 +7,10 @@ import (
 
 func Migrate(db *gorm.DB) {
 	err := db.AutoMigrate(
-		entities.UserModels{})
+		entities.UserModels{},
+		entities.AddressModels{},
+		entities.ProductModels{},
+		entities.ProductPhotoModels{})
 
 	if err != nil {
 		return
