@@ -21,3 +21,19 @@ func CarouselFormatter(carousel *entities.CarouselModels) *CarouselResponse {
 	}
 	return carouselFormatter
 }
+
+func ResponseArrayCarousel(data []*entities.CarouselModels) []*CarouselResponse {
+	res := make([]*CarouselResponse, 0)
+
+	for _, carouselItem := range data {
+		carouselRes := &CarouselResponse{
+			ID:        carouselItem.ID,
+			Name:      carouselItem.Name,
+			Photo:     carouselItem.Photo,
+			CreatedAt: carouselItem.CreatedAt,
+		}
+		res = append(res, carouselRes)
+	}
+
+	return res
+}

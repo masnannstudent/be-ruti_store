@@ -72,3 +72,28 @@ func (h *HomeHandler) GetCarouselByID(c *fiber.Ctx) error {
 
 	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved carousel by ID", domain.CarouselFormatter(result))
 }
+
+func (h *HomeHandler) GetAllCarouselItems(c *fiber.Ctx) error {
+	currentPage, err := strconv.Atoi(c.Query("page"))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page number")
+	}
+
+	pageSize, err := strconv.Atoi(c.Query("page_size"))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
+	}
+
+	result, totalItems, err := h.service.GetAllCarouselItems(currentPage, pageSize)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	currentPage, totalPages, nextPage, prevPage, err := h.service.GetCarouselPage(currentPage, pageSize)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
+	}
+
+	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
+		domain.ResponseArrayCarousel(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
+}

@@ -28,4 +28,5 @@ func SetupRoutesHome(app *fiber.App, jwt token.JWTInterface, userService user.Us
 	api := app.Group("/api/v1/home")
 	api.Post("/carousel", middleware.AuthMiddleware(jwt, userService), hand.CreateCarousel)
 	api.Get("carousel/:id", middleware.AuthMiddleware(jwt, userService), hand.GetCarouselByID)
+	api.Get("/carousel", hand.GetAllCarouselItems)
 }
