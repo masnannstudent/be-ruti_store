@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"ruti-store/module/feature/address"
 	"ruti-store/module/feature/auth"
+	"ruti-store/module/feature/home"
 	"ruti-store/module/feature/order"
 	"ruti-store/module/feature/product"
 	user "ruti-store/module/feature/user/domain"
@@ -23,4 +24,6 @@ func SetupRoutes(app *fiber.App, db *gorm.DB, jwt token.JWTInterface,
 	order.SetupOrderRoutes(app, jwt, userService)
 	address.InitializeAddress(db)
 	address.SetupRoutesAddress(app, jwt, userService)
+	home.InitializeHome(db)
+	home.SetupRoutesHome(app, jwt, userService)
 }

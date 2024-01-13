@@ -14,6 +14,10 @@ type Config struct {
 	Secret      string
 	ServerKey   string
 	ClientKey   string
+	CCName      string
+	CCAPIKey    string
+	CCAPISecret string
+	CCFolder    string
 }
 
 func InitConfig() *Config {
@@ -55,6 +59,20 @@ func loadConfig() *Config {
 
 	if val, found := os.LookupEnv("CLIENTKEY"); found {
 		res.ClientKey = val
+	}
+
+	if value, found := os.LookupEnv("CCNAME"); found {
+		res.CCName = value
+	}
+
+	if value, found := os.LookupEnv("CCAPIKEY"); found {
+		res.CCAPIKey = value
+	}
+	if value, found := os.LookupEnv("CCAPISECRET"); found {
+		res.CCAPISecret = value
+	}
+	if value, found := os.LookupEnv("CCFOLDER"); found {
+		res.CCFolder = value
 	}
 
 	return res
