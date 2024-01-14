@@ -97,3 +97,48 @@ func (h *HomeHandler) GetAllCarouselItems(c *fiber.Ctx) error {
 	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
 		domain.ResponseArrayCarousel(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
 }
+
+func (h *HomeHandler) UpdateCarousel(c *fiber.Ctx) error {
+	id := c.Params("id")
+	carouselID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	req := new(domain.UpdateCarouselRequest)
+
+	file, err := c.FormFile("photo")
+	var uploadedURL string
+	if err == nil {
+		fileToUpload, err := file.Open()
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Error opening file: "+err.Error())
+		}
+		defer func(fileToUpload multipart.File) {
+			_ = fileToUpload.Close()
+		}(fileToUpload)
+
+		uploadedURL, err = upload.ImageUploadHelper(fileToUpload)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Error uploading file: "+err.Error())
+		}
+	}
+
+	req.Photo = uploadedURL
+
+	if err := c.BodyParser(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Failed to parse request body")
+	}
+
+	if err := validator.ValidateStruct(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	err = h.service.UpdateCarousel(carouselID, req)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusCreated, "Success update carousels")
+
+}

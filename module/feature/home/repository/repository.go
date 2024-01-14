@@ -72,7 +72,11 @@ func (r *HomeRepository) GetPaginatedCarousel(page, pageSize int) ([]*entities.C
 
 	offset := (page - 1) * pageSize
 
-	if err := r.db.Offset(offset).Limit(pageSize).Find(&carousels).Where("deleted_at IS NULL").Error; err != nil {
+	if err := r.db.Offset(offset).
+		Limit(pageSize).
+		Find(&carousels).
+		Order("created_at DESC").
+		Where("deleted_at IS NULL").Error; err != nil {
 		return nil, err
 	}
 

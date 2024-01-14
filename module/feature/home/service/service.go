@@ -41,12 +41,19 @@ func (s *HomeService) GetCarouselById(carouselID uint64) (*entities.CarouselMode
 	return carousels, nil
 }
 
-func (s *HomeService) UpdateCarousel(carouselID uint64, updatedCarousel *entities.CarouselModels) error {
+func (s *HomeService) UpdateCarousel(carouselID uint64, req *domain.UpdateCarouselRequest) error {
 	carousels, err := s.repo.GetCarouselById(carouselID)
 	if err != nil {
 		return errors.New("carousels not found")
 	}
-	err = s.repo.UpdateCarousel(carousels.ID, updatedCarousel)
+	newData := &entities.CarouselModels{
+		ID:        carousels.ID,
+		Name:      req.Name,
+		Photo:     req.Photo,
+		UpdatedAt: time.Now(),
+	}
+
+	err = s.repo.UpdateCarousel(carousels.ID, newData)
 	if err != nil {
 		return err
 	}
