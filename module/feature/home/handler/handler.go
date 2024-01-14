@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 	"mime/multipart"
+	"ruti-store/module/entities"
 	"ruti-store/module/feature/home/domain"
 	"ruti-store/utils/response"
 	"ruti-store/utils/upload"
@@ -21,6 +22,14 @@ func NewHomeHandler(service domain.HomeServiceInterface) domain.HomeHandlerInter
 }
 
 func (h *HomeHandler) CreateCarousel(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
 	req := new(domain.CreateCarouselRequest)
 	file, err := c.FormFile("photo")
 	var uploadedURL string
@@ -96,4 +105,102 @@ func (h *HomeHandler) GetAllCarouselItems(c *fiber.Ctx) error {
 
 	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
 		domain.ResponseArrayCarousel(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
+}
+
+func (h *HomeHandler) UpdateCarousel(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+
+	id := c.Params("id")
+	carouselID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	req := new(domain.UpdateCarouselRequest)
+
+	file, err := c.FormFile("photo")
+	var uploadedURL string
+	if err == nil {
+		fileToUpload, err := file.Open()
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Error opening file: "+err.Error())
+		}
+		defer func(fileToUpload multipart.File) {
+			_ = fileToUpload.Close()
+		}(fileToUpload)
+
+		uploadedURL, err = upload.ImageUploadHelper(fileToUpload)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Error uploading file: "+err.Error())
+		}
+	}
+
+	req.Photo = uploadedURL
+
+	if err := c.BodyParser(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Failed to parse request body")
+	}
+
+	if err := validator.ValidateStruct(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	err = h.service.UpdateCarousel(carouselID, req)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success update carousels")
+
+}
+
+func (h *HomeHandler) DeleteCarousel(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+
+	id := c.Params("id")
+	carouselID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	err = h.service.DeleteCarousel(carouselID)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve carousel: "+err.Error())
+	}
+
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success delete carousels")
+}
+
+func (h *HomeHandler) GetDashboard(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+
+	totalIncome, totalProduct, totalUser, err := h.service.GetDashboardPage()
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve dashboard: "+err.Error())
+	}
+
+	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved dashboard",
+		domain.FormatDashboardResponse(totalIncome, totalProduct, totalUser))
+
 }
