@@ -37,3 +37,18 @@ func ResponseArrayCarousel(data []*entities.CarouselModels) []*CarouselResponse 
 
 	return res
 }
+
+type DashboardResponse struct {
+	TotalIncome  uint64 `json:"total_income"`
+	TotalProduct int64  `json:"total_product"`
+	TotalUser    int64  `json:"total_user"`
+}
+
+func FormatDashboardResponse(totalIncome uint64, totalProduct, totalUser int64) *DashboardResponse {
+	result := &DashboardResponse{
+		TotalIncome:  totalIncome,
+		TotalProduct: totalProduct,
+		TotalUser:    totalUser,
+	}
+	return result
+}

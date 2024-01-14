@@ -41,12 +41,19 @@ func (s *HomeService) GetCarouselById(carouselID uint64) (*entities.CarouselMode
 	return carousels, nil
 }
 
-func (s *HomeService) UpdateCarousel(carouselID uint64, updatedCarousel *entities.CarouselModels) error {
+func (s *HomeService) UpdateCarousel(carouselID uint64, req *domain.UpdateCarouselRequest) error {
 	carousels, err := s.repo.GetCarouselById(carouselID)
 	if err != nil {
 		return errors.New("carousels not found")
 	}
-	err = s.repo.UpdateCarousel(carousels.ID, updatedCarousel)
+	newData := &entities.CarouselModels{
+		ID:        carousels.ID,
+		Name:      req.Name,
+		Photo:     req.Photo,
+		UpdatedAt: time.Now(),
+	}
+
+	err = s.repo.UpdateCarousel(carousels.ID, newData)
 	if err != nil {
 		return err
 	}
@@ -98,4 +105,23 @@ func (s *HomeService) GetCarouselPage(currentPage, pageSize int) (int, int, int,
 	}
 
 	return currentPage, totalPages, nextPage, prevPage, nil
+}
+
+func (s *HomeService) GetDashboardPage() (uint64, int64, int64, error) {
+	totalProduct, err := s.repo.GetTotalProduct()
+	if err != nil {
+		return 0, 0, 0, err
+	}
+	totalUser, err := s.repo.GetTotalUser()
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	totalIncome, err := s.repo.GetTotalIncome()
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	return totalIncome, totalProduct, totalUser, nil
+
 }
