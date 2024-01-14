@@ -184,3 +184,23 @@ func (h *HomeHandler) DeleteCarousel(c *fiber.Ctx) error {
 
 	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success delete carousels")
 }
+
+func (h *HomeHandler) GetDashboard(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+
+	totalIncome, totalProduct, totalUser, err := h.service.GetDashboardPage()
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve dashboard: "+err.Error())
+	}
+
+	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved dashboard",
+		domain.FormatDashboardResponse(totalIncome, totalProduct, totalUser))
+
+}

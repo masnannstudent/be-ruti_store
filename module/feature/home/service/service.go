@@ -106,3 +106,22 @@ func (s *HomeService) GetCarouselPage(currentPage, pageSize int) (int, int, int,
 
 	return currentPage, totalPages, nextPage, prevPage, nil
 }
+
+func (s *HomeService) GetDashboardPage() (uint64, int64, int64, error) {
+	totalProduct, err := s.repo.GetTotalProduct()
+	if err != nil {
+		return 0, 0, 0, err
+	}
+	totalUser, err := s.repo.GetTotalUser()
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	totalIncome, err := s.repo.GetTotalIncome()
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	return totalIncome, totalProduct, totalUser, nil
+
+}

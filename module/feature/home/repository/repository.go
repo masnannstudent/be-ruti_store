@@ -84,3 +84,41 @@ func (r *HomeRepository) GetPaginatedCarousel(page, pageSize int) ([]*entities.C
 
 	return carousels, nil
 }
+
+func (r *HomeRepository) GetTotalProduct() (int64, error) {
+	var totalItems int64
+
+	if err := r.db.Where("deleted_at IS NULL").
+		Model(&entities.ProductModels{}).Count(&totalItems).Error; err != nil {
+		return 0, err
+	}
+
+	return totalItems, nil
+}
+
+func (r *HomeRepository) GetTotalUser() (int64, error) {
+	var totalItems int64
+
+	if err := r.db.Where("deleted_at IS NULL").
+		Model(&entities.UserModels{}).Count(&totalItems).Error; err != nil {
+		return 0, err
+	}
+
+	return totalItems, nil
+}
+
+func (r *HomeRepository) GetTotalIncome() (uint64, error) {
+	var totalIncome uint64
+
+	err := r.db.Model(&entities.OrderModels{}).
+		Select("SUM(total_amount_paid) as total_income").
+		Where("payment_status = ?", "Konfirmasi").
+		Pluck("total_income", &totalIncome).
+		Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return totalIncome, nil
+}

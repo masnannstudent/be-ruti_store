@@ -12,6 +12,9 @@ type HomeRepositoryInterface interface {
 	DeleteCarousel(carouselID uint64) error
 	GetTotalCarouselItems() (int64, error)
 	GetPaginatedCarousel(page, pageSize int) ([]*entities.CarouselModels, error)
+	GetTotalProduct() (int64, error)
+	GetTotalUser() (int64, error)
+	GetTotalIncome() (uint64, error)
 }
 
 type HomeServiceInterface interface {
@@ -21,6 +24,7 @@ type HomeServiceInterface interface {
 	DeleteCarousel(carouselID uint64) error
 	GetCarouselPage(currentPage, pageSize int) (int, int, int, int, error)
 	GetAllCarouselItems(page, pageSize int) ([]*entities.CarouselModels, int64, error)
+	GetDashboardPage() (uint64, int64, int64, error)
 }
 
 type HomeHandlerInterface interface {
@@ -29,4 +33,5 @@ type HomeHandlerInterface interface {
 	GetAllCarouselItems(c *fiber.Ctx) error
 	UpdateCarousel(c *fiber.Ctx) error
 	DeleteCarousel(c *fiber.Ctx) error
+	GetDashboard(c *fiber.Ctx) error
 }
