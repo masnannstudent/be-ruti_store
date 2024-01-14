@@ -60,7 +60,8 @@ func (r *HomeRepository) DeleteCarousel(carouselID uint64) error {
 func (r *HomeRepository) GetTotalCarouselItems() (int64, error) {
 	var totalItems int64
 
-	if err := r.db.Model(&entities.CarouselModels{}).Where("deleted_at IS NULL").Count(&totalItems).Error; err != nil {
+	if err := r.db.Where("deleted_at IS NULL").
+		Model(&entities.CarouselModels{}).Count(&totalItems).Error; err != nil {
 		return 0, err
 	}
 
@@ -72,11 +73,12 @@ func (r *HomeRepository) GetPaginatedCarousel(page, pageSize int) ([]*entities.C
 
 	offset := (page - 1) * pageSize
 
-	if err := r.db.Offset(offset).
+	if err := r.db.Where("deleted_at IS NULL").
+		Offset(offset).
 		Limit(pageSize).
 		Find(&carousels).
 		Order("created_at DESC").
-		Where("deleted_at IS NULL").Error; err != nil {
+		Error; err != nil {
 		return nil, err
 	}
 

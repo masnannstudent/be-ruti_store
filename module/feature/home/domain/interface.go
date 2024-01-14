@@ -28,4 +28,5 @@ type HomeHandlerInterface interface {
 	GetCarouselByID(c *fiber.Ctx) error
 	GetAllCarouselItems(c *fiber.Ctx) error
 	UpdateCarousel(c *fiber.Ctx) error
+	DeleteCarousel(c *fiber.Ctx) error
 }
