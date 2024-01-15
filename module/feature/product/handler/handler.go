@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"ruti-store/module/feature/product/domain"
 	"ruti-store/utils/response"
+	"ruti-store/utils/validator"
 	"strconv"
 )
 
@@ -55,4 +56,23 @@ func (h *ProductHandler) GetProductByID(c *fiber.Ctx) error {
 	}
 
 	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved product by ID", result)
+}
+
+func (h *ProductHandler) CreateProduct(c *fiber.Ctx) error {
+
+	req := new(domain.CreateProductRequest)
+	if err := c.BodyParser(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Failed to parse request body")
+	}
+
+	if err := validator.ValidateStruct(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	result, err := h.service.CreateProduct(req)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	return response.SuccessBuildResponse(c, fiber.StatusCreated, "Success create product", domain.ResponseDetailProducts(result))
 }

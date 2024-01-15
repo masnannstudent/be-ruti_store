@@ -48,3 +48,23 @@ func (r *ProductRepository) GetProductByID(productID uint64) (*entities.ProductM
 	}
 	return product, nil
 }
+
+func (r *ProductRepository) CreateProduct(product *entities.ProductModels, categoryIDs []uint64) (*entities.ProductModels, error) {
+
+	if err := r.db.Create(product).Error; err != nil {
+		return nil, err
+	}
+
+	if len(categoryIDs) > 0 {
+		categories := make([]entities.CategoryModels, len(categoryIDs))
+		for i, categoryID := range categoryIDs {
+			categories[i] = entities.CategoryModels{ID: categoryID}
+		}
+
+		if err := r.db.Model(product).Association("Categories").Replace(categories); err != nil {
+			return nil, err
+		}
+	}
+
+	return product, nil
+}

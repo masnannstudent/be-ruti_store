@@ -44,7 +44,7 @@ func (r *CategoryRepository) GetPaginatedCategories(page, pageSize int) ([]*enti
 func (r *CategoryRepository) GetCategoryByID(categoryID uint64) (*entities.CategoryModels, error) {
 	var category *entities.CategoryModels
 
-	if err := r.db.Where("id = ? AND deleted_at IS NULL", categoryID).Preload("Products").First(&category).Error; err != nil {
+	if err := r.db.Where("id = ? AND deleted_at IS NULL", categoryID).Preload("Product").First(&category).Error; err != nil {
 		return nil, err
 	}
 	return category, nil

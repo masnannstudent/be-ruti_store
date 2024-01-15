@@ -4,6 +4,7 @@ import (
 	"math"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/product/domain"
+	"time"
 )
 
 type ProductService struct {
@@ -53,6 +54,23 @@ func (s *ProductService) GetProductsPage(currentPage, pageSize int) (int, int, i
 
 func (s *ProductService) GetProductByID(productID uint64) (*entities.ProductModels, error) {
 	result, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (s *ProductService) CreateProduct(req *domain.CreateProductRequest) (*entities.ProductModels, error) {
+	newProduct := &entities.ProductModels{
+		Name:        req.Name,
+		Price:       req.Price,
+		Description: req.Description,
+		Discount:    req.Discount,
+		Stock:       req.Stock,
+		CreatedAt:   time.Now(),
+	}
+
+	result, err := s.repo.CreateProduct(newProduct, req.CategoryID)
 	if err != nil {
 		return nil, err
 	}

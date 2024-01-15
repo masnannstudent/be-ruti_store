@@ -5,14 +5,10 @@ import (
 	"github.com/midtrans/midtrans-go/coreapi"
 	"github.com/midtrans/midtrans-go/snap"
 	"gorm.io/gorm"
-	"ruti-store/module/feature/middleware"
-	"ruti-store/utils/shipping"
-	"ruti-store/utils/token"
-
 	address "ruti-store/module/feature/address/domain"
 	addressRepository "ruti-store/module/feature/address/repository"
 	addressService "ruti-store/module/feature/address/service"
-
+	"ruti-store/module/feature/middleware"
 	"ruti-store/module/feature/order/domain"
 	"ruti-store/module/feature/order/handler"
 	"ruti-store/module/feature/order/repository"
@@ -24,6 +20,8 @@ import (
 	userRepository "ruti-store/module/feature/user/repository"
 	userService "ruti-store/module/feature/user/service"
 	generator2 "ruti-store/utils/generator"
+	"ruti-store/utils/shipping"
+	"ruti-store/utils/token"
 )
 
 var (
