@@ -10,6 +10,7 @@ import (
 	"ruti-store/module/feature/home"
 	"ruti-store/module/feature/order"
 	"ruti-store/module/feature/product"
+	users "ruti-store/module/feature/user"
 	user "ruti-store/module/feature/user/domain"
 	"ruti-store/utils/token"
 )
@@ -26,4 +27,6 @@ func SetupRoutes(app *fiber.App, db *gorm.DB, jwt token.JWTInterface,
 	address.SetupRoutesAddress(app, jwt, userService)
 	home.InitializeHome(db)
 	home.SetupRoutesHome(app, jwt, userService)
+	users.InitializeUser(db)
+	users.SetupRoutesUser(app, jwt, userService)
 }
