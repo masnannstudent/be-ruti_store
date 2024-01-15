@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/category/domain"
+	"time"
 )
 
 type CategoryRepository struct {
@@ -55,4 +56,30 @@ func (r *CategoryRepository) CreateCategory(category *entities.CategoryModels) (
 		return nil, err
 	}
 	return category, nil
+}
+
+func (r *CategoryRepository) UpdateCategory(categoryID uint64, updatedCategory *entities.CategoryModels) error {
+	var category *entities.CategoryModels
+	if err := r.db.Where("id = ? AND deleted_at IS NULL", categoryID).First(&category).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Model(category).Updates(updatedCategory).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *CategoryRepository) DeleteCategory(categoryID uint64) error {
+	category := &entities.CategoryModels{}
+	if err := r.db.First(category, categoryID).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Model(category).Update("deleted_at", time.Now()).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

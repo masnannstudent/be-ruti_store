@@ -106,3 +106,56 @@ func (h *CategoryHandler) CreateCategory(c *fiber.Ctx) error {
 
 	return response.SuccessBuildResponse(c, fiber.StatusCreated, "Success create category", domain.CategoryFormatter(result))
 }
+
+func (h *CategoryHandler) UpdateCategory(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+
+	id := c.Params("id")
+	categoryID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	req := new(domain.UpdateCategoryRequest)
+
+	file, err := c.FormFile("photo")
+	var uploadedURL string
+	if err == nil {
+		fileToUpload, err := file.Open()
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Error opening file: "+err.Error())
+		}
+		defer func(fileToUpload multipart.File) {
+			_ = fileToUpload.Close()
+		}(fileToUpload)
+
+		uploadedURL, err = upload.ImageUploadHelper(fileToUpload)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Error uploading file: "+err.Error())
+		}
+	}
+
+	req.Photo = uploadedURL
+
+	if err := c.BodyParser(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Failed to parse request body")
+	}
+
+	if err := validator.ValidateStruct(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	err = h.service.UpdateCategory(categoryID, req)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success update category")
+}

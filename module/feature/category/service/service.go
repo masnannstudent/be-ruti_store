@@ -75,3 +75,39 @@ func (s *CategoryService) CreateCategory(req *domain.CreateCategoryRequest) (*en
 	}
 	return createdCategory, nil
 }
+
+func (s *CategoryService) UpdateCategory(categoryID uint64, req *domain.UpdateCategoryRequest) error {
+	category, err := s.repo.GetCategoryByID(categoryID)
+	if err != nil {
+		return errors.New("category not found")
+	}
+
+	newData := &entities.CategoryModels{
+		ID:          category.ID,
+		Name:        req.Name,
+		Description: req.Description,
+		Photo:       req.Photo,
+		UpdatedAt:   time.Now(),
+	}
+
+	err = s.repo.UpdateCategory(category.ID, newData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *CategoryService) DeleteCategory(categoryID uint64) error {
+	category, err := s.repo.GetCategoryByID(categoryID)
+	if err != nil {
+		return errors.New("category not found")
+	}
+
+	err = s.repo.DeleteCategory(category.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
