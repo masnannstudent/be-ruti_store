@@ -26,4 +26,5 @@ func InitializeCategory(db *gorm.DB) {
 func SetupRoutesCategory(app *fiber.App, jwt token.JWTInterface, userService user.UserServiceInterface) {
 	api := app.Group("/api/v1/category")
 	api.Get("/list", hand.GetAllCategories)
+	api.Get("/details/:id", hand.GetCategoryByID)
 }

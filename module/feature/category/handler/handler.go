@@ -41,3 +41,18 @@ func (h *CategoryHandler) GetAllCategories(c *fiber.Ctx) error {
 	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
 		domain.ResponseArrayCategories(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
 }
+
+func (h *CategoryHandler) GetCategoryByID(c *fiber.Ctx) error {
+	id := c.Params("id")
+	categoryID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	result, err := h.service.GetCategoryByID(categoryID)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve category: "+err.Error())
+	}
+
+	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved category by ID", result)
+}

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"math"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/category/domain"
@@ -49,4 +50,12 @@ func (s *CategoryService) GetCategoriesPage(currentPage, pageSize int) (int, int
 	}
 
 	return currentPage, totalPages, nextPage, prevPage, nil
+}
+
+func (s *CategoryService) GetCategoryByID(categoryID uint64) (*entities.CategoryModels, error) {
+	result, err := s.repo.GetCategoryByID(categoryID)
+	if err != nil {
+		return nil, errors.New("category not found")
+	}
+	return result, nil
 }
