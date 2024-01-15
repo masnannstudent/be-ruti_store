@@ -24,3 +24,11 @@ func (r *UserRepository) GetUserByID(addressID uint64) (*entities.UserModels, er
 	}
 	return users, nil
 }
+
+func (r *UserRepository) EditProfile(userID uint64, req *entities.UserModels) error {
+	var user *entities.UserModels
+	if err := r.db.Model(&user).Where("id = ?", userID).Updates(&req).Error; err != nil {
+		return err
+	}
+	return nil
+}

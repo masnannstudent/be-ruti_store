@@ -24,3 +24,18 @@ func UserFormatter(user *entities.UserModels) *UserResponse {
 	}
 	return result
 }
+
+type UserEditProfileResponse struct {
+	Phone        string `json:"phone"`
+	Name         string `json:"name"`
+	PhotoProfile string `json:"photo_profile"`
+}
+
+func UserEditProfileFormatter(user *entities.UserModels) *UserEditProfileResponse {
+	result := &UserEditProfileResponse{
+		Phone:        user.Phone,
+		Name:         user.Name,
+		PhotoProfile: user.PhotoProfile,
+	}
+	return result
+}
