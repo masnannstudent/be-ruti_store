@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"math"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/product/domain"
@@ -75,4 +76,26 @@ func (s *ProductService) CreateProduct(req *domain.CreateProductRequest) (*entit
 		return nil, err
 	}
 	return result, nil
+}
+
+func (s *ProductService) UpdateProduct(productID uint64, req *domain.UpdateProductRequest) error {
+	product, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	newData := &entities.ProductModels{
+		Name:        req.Name,
+		Price:       req.Price,
+		Description: req.Description,
+		Discount:    req.Discount,
+		Stock:       req.Stock,
+		UpdatedAt:   time.Now(),
+	}
+
+	err = s.repo.UpdateProduct(product.ID, newData, req.CategoryID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"ruti-store/module/entities"
 	"ruti-store/module/feature/product/domain"
 	"ruti-store/utils/response"
 	"ruti-store/utils/validator"
@@ -59,7 +60,14 @@ func (h *ProductHandler) GetProductByID(c *fiber.Ctx) error {
 }
 
 func (h *ProductHandler) CreateProduct(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
 
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
 	req := new(domain.CreateProductRequest)
 	if err := c.BodyParser(req); err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Failed to parse request body")
@@ -75,4 +83,37 @@ func (h *ProductHandler) CreateProduct(c *fiber.Ctx) error {
 	}
 
 	return response.SuccessBuildResponse(c, fiber.StatusCreated, "Success create product", domain.ResponseDetailProducts(result))
+}
+
+func (h *ProductHandler) UpdateProduct(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+
+	req := new(domain.UpdateProductRequest)
+	id := c.Params("id")
+	productID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	if err := c.BodyParser(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Failed to parse request body")
+	}
+
+	if err := validator.ValidateStruct(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	err = h.service.UpdateProduct(productID, req)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusCreated, "Success update product")
 }
