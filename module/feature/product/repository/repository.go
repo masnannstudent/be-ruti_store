@@ -98,3 +98,22 @@ func (r *ProductRepository) UpdateProduct(productID uint64, newData *entities.Pr
 
 	return nil
 }
+
+func (r *ProductRepository) DeleteProduct(productID uint64) error {
+	var existingProduct *entities.ProductModels
+	if err := r.db.Where("id = ?", productID).Preload("Categories").First(&existingProduct).Error; err != nil {
+		return err
+	}
+
+	if len(existingProduct.Categories) > 0 {
+		if err := r.db.Model(existingProduct).Association("Categories").Delete(&existingProduct.Categories); err != nil {
+			return err
+		}
+	}
+
+	if err := r.db.Delete(existingProduct).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

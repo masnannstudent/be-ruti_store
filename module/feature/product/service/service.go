@@ -99,3 +99,15 @@ func (s *ProductService) UpdateProduct(productID uint64, req *domain.UpdateProdu
 	}
 	return nil
 }
+func (s *ProductService) DeleteProduct(productID uint64) error {
+	product, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	err = s.repo.DeleteProduct(product.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

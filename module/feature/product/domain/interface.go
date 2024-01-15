@@ -11,6 +11,7 @@ type ProductRepositoryInterface interface {
 	GetProductByID(productID uint64) (*entities.ProductModels, error)
 	CreateProduct(product *entities.ProductModels, categoryIDs []uint64) (*entities.ProductModels, error)
 	UpdateProduct(productID uint64, newData *entities.ProductModels, categoryIDs []uint64) error
+	DeleteProduct(productID uint64) error
 }
 
 type ProductServiceInterface interface {
@@ -19,6 +20,7 @@ type ProductServiceInterface interface {
 	GetProductByID(productID uint64) (*entities.ProductModels, error)
 	CreateProduct(req *CreateProductRequest) (*entities.ProductModels, error)
 	UpdateProduct(productID uint64, req *UpdateProductRequest) error
+	DeleteProduct(productID uint64) error
 }
 
 type ProductHandlerInterface interface {
@@ -26,4 +28,5 @@ type ProductHandlerInterface interface {
 	GetProductByID(c *fiber.Ctx) error
 	CreateProduct(c *fiber.Ctx) error
 	UpdateProduct(c *fiber.Ctx) error
+	DeleteProduct(c *fiber.Ctx) error
 }
