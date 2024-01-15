@@ -27,4 +27,5 @@ func SetupRoutesReviews(app *fiber.App, jwt token.JWTInterface, userService user
 	api := app.Group("/api/v1/reviews")
 	api.Get("/list", reviewHand.GetAllReviews)
 	api.Get("/details/:id", reviewHand.GetReviewByID)
+	api.Get("list/:id", reviewHand.GetAllReviewProduct)
 }

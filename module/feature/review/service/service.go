@@ -59,3 +59,38 @@ func (s *ReviewService) GetReviewById(reviewID uint64) (*entities.ReviewModels, 
 	}
 	return result, nil
 }
+
+func (s *ReviewService) GetReviewsByProductID(productID uint64, page, pageSize int) ([]*entities.ReviewModels, int64, error) {
+	reviews, err := s.repo.GetPaginatedReviewsByProductID(productID, page, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	totalReviews, err := s.repo.GetTotalReviewsByProductID(productID)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return reviews, totalReviews, nil
+}
+
+func (s *ReviewService) GetReviewsProductPage(productID uint64, currentPage, pageSize int) (int, int, int, int, error) {
+	totalItems, err := s.repo.GetTotalReviewsByProductID(productID)
+	if err != nil {
+		return 0, 0, 0, 0, err
+	}
+
+	totalPages := int(math.Ceil(float64(totalItems) / float64(pageSize)))
+	nextPage := currentPage + 1
+	prevPage := currentPage - 1
+
+	if nextPage > totalPages {
+		nextPage = 0
+	}
+
+	if prevPage < 1 {
+		prevPage = 0
+	}
+
+	return currentPage, totalPages, nextPage, prevPage, nil
+}
