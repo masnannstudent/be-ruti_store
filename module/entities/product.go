@@ -15,6 +15,7 @@ type ProductModels struct {
 	UpdatedAt    time.Time            `gorm:"column:updated_at;type:timestamp" json:"updated_at"`
 	DeletedAt    *time.Time           `gorm:"column:deleted_at;type:TIMESTAMP NULL;index" json:"deleted_at"`
 	Photos       []ProductPhotoModels `gorm:"foreignKey:ProductID" json:"photos"`
+	Categories   []*CategoryModels    `gorm:"many2many:product_categories;" json:"categories"`
 }
 
 type ProductPhotoModels struct {
