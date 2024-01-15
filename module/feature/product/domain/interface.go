@@ -12,6 +12,9 @@ type ProductRepositoryInterface interface {
 	CreateProduct(product *entities.ProductModels, categoryIDs []uint64) (*entities.ProductModels, error)
 	UpdateProduct(productID uint64, newData *entities.ProductModels, categoryIDs []uint64) error
 	DeleteProduct(productID uint64) error
+	UpdateTotalReview(productID uint64) error
+	UpdateProductRating(productID uint64, newRating float64) error
+	GetProductReviews(page, perPage int) ([]*entities.ProductModels, error)
 }
 
 type ProductServiceInterface interface {
@@ -21,6 +24,9 @@ type ProductServiceInterface interface {
 	CreateProduct(req *CreateProductRequest) (*entities.ProductModels, error)
 	UpdateProduct(productID uint64, req *UpdateProductRequest) error
 	DeleteProduct(productID uint64) error
+	UpdateTotalReview(productID uint64) error
+	UpdateProductRating(productID uint64, newRating float64) error
+	GetProductReviews(page, perPage int) ([]*entities.ProductModels, int64, error)
 }
 
 type ProductHandlerInterface interface {
@@ -29,4 +35,5 @@ type ProductHandlerInterface interface {
 	CreateProduct(c *fiber.Ctx) error
 	UpdateProduct(c *fiber.Ctx) error
 	DeleteProduct(c *fiber.Ctx) error
+	GetAllProductsReview(c *fiber.Ctx) error
 }

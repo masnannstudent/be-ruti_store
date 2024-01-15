@@ -31,4 +31,5 @@ func SetupRoutesProduct(app *fiber.App, jwt token.JWTInterface, userService user
 	api.Post("/create", middleware.AuthMiddleware(jwt, userService), hand.CreateProduct)
 	api.Put("/update/:id", middleware.AuthMiddleware(jwt, userService), hand.UpdateProduct)
 	api.Delete("/delete/:id", middleware.AuthMiddleware(jwt, userService), hand.DeleteProduct)
+	api.Get("/reviews", middleware.AuthMiddleware(jwt, userService), hand.GetAllProductsReview)
 }

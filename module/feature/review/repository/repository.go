@@ -16,31 +16,6 @@ func NewReviewRepository(db *gorm.DB) domain.ReviewRepositoryInterface {
 	}
 }
 
-func (r *ReviewRepository) GetTotalItems() (int64, error) {
-	var totalItems int64
-
-	if err := r.db.Where("deleted_at IS NULL").
-		Model(&entities.ReviewModels{}).Count(&totalItems).Error; err != nil {
-		return 0, err
-	}
-
-	return totalItems, nil
-}
-
-func (r *ReviewRepository) GetPaginatedReviews(page, pageSize int) ([]*entities.ReviewModels, error) {
-	var reviews []*entities.ReviewModels
-
-	offset := (page - 1) * pageSize
-
-	if err := r.db.Where("deleted_at IS NULL").
-		Order("created_at DESC").
-		Offset(offset).Limit(pageSize).Find(&reviews).Error; err != nil {
-		return nil, err
-	}
-
-	return reviews, nil
-}
-
 func (r *ReviewRepository) GetReviewsById(reviewID uint64) (*entities.ReviewModels, error) {
 	var reviews *entities.ReviewModels
 
@@ -59,6 +34,8 @@ func (r *ReviewRepository) GetPaginatedReviewsByProductID(productID uint64, page
 	offset := (page - 1) * pageSize
 
 	if err := r.db.
+		Preload("User").
+		Preload("Photos").
 		Where("product_id = ? AND deleted_at IS NULL", productID).
 		Order("created_at DESC").
 		Offset(offset).Limit(pageSize).Find(&reviews).Error; err != nil {
@@ -79,4 +56,31 @@ func (r *ReviewRepository) GetTotalReviewsByProductID(productID uint64) (int64, 
 	}
 
 	return totalReviews, nil
+}
+
+func (r *ReviewRepository) CreateReview(newData *entities.ReviewModels) (*entities.ReviewModels, error) {
+	err := r.db.Create(newData).Error
+	if err != nil {
+		return nil, err
+	}
+	return newData, nil
+}
+
+func (r *ReviewRepository) CreateReviewImages(newData *entities.ReviewPhotoModels) (*entities.ReviewPhotoModels, error) {
+	err := r.db.Create(newData).Error
+	if err != nil {
+		return nil, err
+	}
+	return newData, nil
+}
+
+func (r *ReviewRepository) CountAverageRating(productID uint64) (float64, error) {
+	var averageRating float64
+
+	query := "SELECT AVG(rating) FROM reviews WHERE product_id = ?"
+	if err := r.db.Raw(query, productID).Scan(&averageRating).Error; err != nil {
+		return 0, err
+	}
+
+	return averageRating, nil
 }

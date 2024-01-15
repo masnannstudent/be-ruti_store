@@ -111,3 +111,39 @@ func (s *ProductService) DeleteProduct(productID uint64) error {
 	}
 	return nil
 }
+
+func (s *ProductService) UpdateTotalReview(productID uint64) error {
+	products, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+	err = s.repo.UpdateTotalReview(products.ID)
+	if err != nil {
+		return errors.New("failed to update total reviews")
+	}
+
+	return nil
+}
+
+func (s *ProductService) UpdateProductRating(productID uint64, newRating float64) error {
+	err := s.repo.UpdateProductRating(productID, newRating)
+	if err != nil {
+		return errors.New("failed to update product rating")
+	}
+
+	return nil
+}
+
+func (s *ProductService) GetProductReviews(page, perPage int) ([]*entities.ProductModels, int64, error) {
+	products, err := s.repo.GetProductReviews(page, perPage)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	totalItems, err := s.repo.GetTotalItems()
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return products, totalItems, nil
+}
