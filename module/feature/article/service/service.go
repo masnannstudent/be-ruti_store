@@ -76,3 +76,38 @@ func (s *ArticleService) CreateArticle(req *domain.CreateArticleRequest) (*entit
 	}
 	return createdArticle, nil
 }
+
+func (s *ArticleService) UpdateArticle(articleID uint64, req *domain.UpdateArticleRequest) error {
+	article, err := s.repo.GetArticleByID(articleID)
+	if err != nil {
+		return errors.New("article not found")
+	}
+
+	newData := &entities.ArticleModels{
+		Title:     req.Title,
+		Content:   req.Content,
+		Photo:     req.Photo,
+		UpdatedAt: time.Now(),
+	}
+
+	err = s.repo.UpdateArticle(article.ID, newData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *ArticleService) DeleteArticle(articleID uint64) error {
+	article, err := s.repo.GetArticleByID(articleID)
+	if err != nil {
+		return errors.New("article not found")
+	}
+
+	err = s.repo.DeleteArticle(article.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

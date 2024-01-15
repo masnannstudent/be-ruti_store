@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/article/domain"
+	"time"
 )
 
 type ArticleRepository struct {
@@ -61,4 +62,30 @@ func (r *ArticleRepository) CreateArticle(article *entities.ArticleModels) (*ent
 	}
 
 	return article, nil
+}
+
+func (r *ArticleRepository) UpdateArticle(articleID uint64, updatedArticle *entities.ArticleModels) error {
+	var article *entities.ArticleModels
+	if err := r.db.Where("id = ? AND deleted_at IS NULL", articleID).First(&article).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Model(article).Updates(updatedArticle).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *ArticleRepository) DeleteArticle(articleID uint64) error {
+	article := &entities.ArticleModels{}
+	if err := r.db.First(article, articleID).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Model(article).Update("deleted_at", time.Now()).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
