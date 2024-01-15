@@ -53,7 +53,7 @@ func (h *ProductHandler) GetProductByID(c *fiber.Ctx) error {
 
 	result, err := h.service.GetProductByID(productID)
 	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve product: "+err.Error())
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
 	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved product by ID", result)
@@ -135,8 +135,41 @@ func (h *ProductHandler) DeleteProduct(c *fiber.Ctx) error {
 
 	err = h.service.DeleteProduct(productID)
 	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve product: "+err.Error())
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
 	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success delete product")
+}
+
+func (h *ProductHandler) GetAllProductsReview(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+	currentPage, err := strconv.Atoi(c.Query("page"))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page number")
+	}
+
+	pageSize, err := strconv.Atoi(c.Query("page_size"))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
+	}
+
+	result, totalItems, err := h.service.GetProductReviews(currentPage, pageSize)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	currentPage, totalPages, nextPage, prevPage, err := h.service.GetProductsPage(currentPage, pageSize)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
+	}
+
+	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
+		domain.ResponseArrayProductReviews(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
 }

@@ -71,3 +71,24 @@ func getPhotoResponses(photos []entities.ProductPhotoModels) []ProductPhotoRespo
 	}
 	return responses
 }
+
+type ReviewProductFormatter struct {
+	ID          uint64  `json:"id"`
+	Name        string  `json:"name"`
+	Rating      float64 `json:"rating"`
+	TotalReview uint64  `json:"total_review"`
+}
+
+func ResponseArrayProductReviews(products []*entities.ProductModels) []*ReviewProductFormatter {
+	productFormatters := make([]*ReviewProductFormatter, 0)
+	for _, product := range products {
+		productFormatter := &ReviewProductFormatter{
+			ID:          product.ID,
+			Name:        product.Name,
+			Rating:      product.Rating,
+			TotalReview: product.TotalReviews,
+		}
+		productFormatters = append(productFormatters, productFormatter)
+	}
+	return productFormatters
+}

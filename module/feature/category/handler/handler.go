@@ -55,7 +55,7 @@ func (h *CategoryHandler) GetCategoryByID(c *fiber.Ctx) error {
 
 	result, err := h.service.GetCategoryByID(categoryID)
 	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve category: "+err.Error())
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
 	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved category by ID", result)
@@ -178,7 +178,7 @@ func (h *CategoryHandler) DeleteCategory(c *fiber.Ctx) error {
 
 	err = h.service.DeleteCategory(categoryID)
 	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to delete category: "+err.Error())
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
 	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success delete category")
