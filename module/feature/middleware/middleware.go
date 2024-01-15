@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
@@ -11,5 +12,5 @@ func SetupMiddlewares(app *fiber.App) {
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,PUT,DELETE",
 	}))
-	app.Use(ConfigureLogging())
+	app.Use(logger.New())
 }

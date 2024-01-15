@@ -15,4 +15,5 @@ type UserServiceInterface interface {
 
 type UserHandlerInterface interface {
 	GetUserByID(c *fiber.Ctx) error
+	GetUserProfile(c *fiber.Ctx) error
 }

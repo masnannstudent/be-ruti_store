@@ -26,4 +26,5 @@ func InitializeUser(db *gorm.DB) {
 func SetupRoutesUser(app *fiber.App, jwt token.JWTInterface, userService domain.UserServiceInterface) {
 	api := app.Group("/api/v1/user")
 	api.Get("/:id", middleware.AuthMiddleware(jwt, userService), hand.GetUserByID)
+	api.Post("/get-profile", middleware.AuthMiddleware(jwt, userService), hand.GetUserProfile)
 }
