@@ -28,4 +28,5 @@ func SetupRoutesUser(app *fiber.App, jwt token.JWTInterface, userService domain.
 	api.Get("/:id", middleware.AuthMiddleware(jwt, userService), hand.GetUserByID)
 	api.Post("/get-profile", middleware.AuthMiddleware(jwt, userService), hand.GetUserProfile)
 	api.Post("/edit-profile", middleware.AuthMiddleware(jwt, userService), hand.EditProfile)
+	api.Get("/", middleware.AuthMiddleware(jwt, userService), hand.GetAllUser)
 }

@@ -99,3 +99,28 @@ func (h *UserHandler) EditProfile(c *fiber.Ctx) error {
 
 	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Successfully retrieved edit profile")
 }
+
+func (h *UserHandler) GetAllUser(c *fiber.Ctx) error {
+	currentPage, err := strconv.Atoi(c.Query("page"))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page number")
+	}
+
+	pageSize, err := strconv.Atoi(c.Query("page_size"))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
+	}
+
+	result, totalItems, err := h.service.GetAllUserItems(currentPage, pageSize)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	currentPage, totalPages, nextPage, prevPage, err := h.service.GetUserPage(currentPage, pageSize)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
+	}
+
+	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
+		domain.ResponseArrayUser(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
+}

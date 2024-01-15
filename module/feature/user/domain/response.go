@@ -39,3 +39,20 @@ func UserEditProfileFormatter(user *entities.UserModels) *UserEditProfileRespons
 	}
 	return result
 }
+
+func ResponseArrayUser(data []*entities.UserModels) []*UserResponse {
+	res := make([]*UserResponse, 0)
+
+	for _, userItem := range data {
+		userRes := &UserResponse{
+			ID:           userItem.ID,
+			Email:        userItem.Email,
+			Phone:        userItem.Phone,
+			Name:         userItem.Name,
+			PhotoProfile: userItem.PhotoProfile,
+		}
+		res = append(res, userRes)
+	}
+
+	return res
+}

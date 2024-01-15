@@ -32,3 +32,31 @@ func (r *UserRepository) EditProfile(userID uint64, req *entities.UserModels) er
 	}
 	return nil
 }
+
+func (r *UserRepository) GetTotalUserItems() (int64, error) {
+	var totalItems int64
+
+	if err := r.db.Where("deleted_at IS NULL").
+		Model(&entities.UserModels{}).Count(&totalItems).Error; err != nil {
+		return 0, err
+	}
+
+	return totalItems, nil
+}
+
+func (r *UserRepository) GetPaginatedUsers(page, pageSize int) ([]*entities.UserModels, error) {
+	var users []*entities.UserModels
+
+	offset := (page - 1) * pageSize
+
+	if err := r.db.Where("deleted_at IS NULL").
+		Offset(offset).
+		Limit(pageSize).
+		Find(&users).
+		Order("created_at DESC").
+		Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
