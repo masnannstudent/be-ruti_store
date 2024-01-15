@@ -53,7 +53,7 @@ func (h *ProductHandler) GetProductByID(c *fiber.Ctx) error {
 
 	result, err := h.service.GetProductByID(productID)
 	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve product: "+err.Error())
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
 	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved product by ID", result)
@@ -135,7 +135,7 @@ func (h *ProductHandler) DeleteProduct(c *fiber.Ctx) error {
 
 	err = h.service.DeleteProduct(productID)
 	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve product: "+err.Error())
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
 	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success delete product")
