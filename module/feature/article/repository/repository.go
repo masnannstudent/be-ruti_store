@@ -54,3 +54,11 @@ func (r *ArticleRepository) GetArticleByID(articleID uint64) (*entities.ArticleM
 
 	return article, nil
 }
+
+func (r *ArticleRepository) CreateArticle(article *entities.ArticleModels) (*entities.ArticleModels, error) {
+	if err := r.db.Create(article).Error; err != nil {
+		return nil, err
+	}
+
+	return article, nil
+}

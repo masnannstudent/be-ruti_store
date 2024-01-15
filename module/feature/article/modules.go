@@ -7,6 +7,7 @@ import (
 	"ruti-store/module/feature/article/handler"
 	"ruti-store/module/feature/article/repository"
 	"ruti-store/module/feature/article/service"
+	"ruti-store/module/feature/middleware"
 	user "ruti-store/module/feature/user/domain"
 	"ruti-store/utils/token"
 )
@@ -27,4 +28,5 @@ func SetupRoutesArticle(app *fiber.App, jwt token.JWTInterface, userService user
 	api := app.Group("/api/v1/article")
 	api.Get("/list", hand.GetAllArticles)
 	api.Get("/details/:id", hand.GetArticleByID)
+	api.Post("/create", middleware.AuthMiddleware(jwt, userService), hand.CreateArticle)
 }

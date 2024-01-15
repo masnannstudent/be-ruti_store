@@ -5,6 +5,7 @@ import (
 	"math"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/article/domain"
+	"time"
 )
 
 type ArticleService struct {
@@ -58,4 +59,20 @@ func (s *ArticleService) GetArticleByID(articleID uint64) (*entities.ArticleMode
 		return nil, errors.New("article not found")
 	}
 	return result, nil
+}
+
+func (s *ArticleService) CreateArticle(req *domain.CreateArticleRequest) (*entities.ArticleModels, error) {
+	newData := &entities.ArticleModels{
+		Title:     req.Title,
+		Content:   req.Content,
+		Author:    "Ruti Store",
+		Photo:     req.Photo,
+		CreatedAt: time.Now(),
+	}
+
+	createdArticle, err := s.repo.CreateArticle(newData)
+	if err != nil {
+		return nil, err
+	}
+	return createdArticle, nil
 }
