@@ -9,15 +9,18 @@ type CategoryRepositoryInterface interface {
 	GetPaginatedCategories(page, pageSize int) ([]*entities.CategoryModels, error)
 	GetTotalItems() (int64, error)
 	GetCategoryByID(categoryID uint64) (*entities.CategoryModels, error)
+	CreateCategory(category *entities.CategoryModels) (*entities.CategoryModels, error)
 }
 
 type CategoryServiceInterface interface {
 	GetAllCategories(page, pageSize int) ([]*entities.CategoryModels, int64, error)
 	GetCategoriesPage(currentPage, pageSize int) (int, int, int, int, error)
 	GetCategoryByID(categoryID uint64) (*entities.CategoryModels, error)
+	CreateCategory(req *CreateCategoryRequest) (*entities.CategoryModels, error)
 }
 
 type CategoryHandlerInterface interface {
 	GetAllCategories(c *fiber.Ctx) error
 	GetCategoryByID(c *fiber.Ctx) error
+	CreateCategory(c *fiber.Ctx) error
 }

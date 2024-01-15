@@ -7,6 +7,7 @@ import (
 	"ruti-store/module/feature/category/handler"
 	"ruti-store/module/feature/category/repository"
 	"ruti-store/module/feature/category/service"
+	"ruti-store/module/feature/middleware"
 	user "ruti-store/module/feature/user/domain"
 	"ruti-store/utils/token"
 )
@@ -27,4 +28,5 @@ func SetupRoutesCategory(app *fiber.App, jwt token.JWTInterface, userService use
 	api := app.Group("/api/v1/category")
 	api.Get("/list", hand.GetAllCategories)
 	api.Get("/details/:id", hand.GetCategoryByID)
+	api.Post("/create", middleware.AuthMiddleware(jwt, userService), hand.CreateCategory)
 }

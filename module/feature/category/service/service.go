@@ -5,6 +5,7 @@ import (
 	"math"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/category/domain"
+	"time"
 )
 
 type CategoryService struct {
@@ -58,4 +59,19 @@ func (s *CategoryService) GetCategoryByID(categoryID uint64) (*entities.Category
 		return nil, errors.New("category not found")
 	}
 	return result, nil
+}
+
+func (s *CategoryService) CreateCategory(req *domain.CreateCategoryRequest) (*entities.CategoryModels, error) {
+	newData := &entities.CategoryModels{
+		Name:        req.Name,
+		Description: req.Description,
+		Photo:       req.Photo,
+		CreatedAt:   time.Now(),
+	}
+
+	createdCategory, err := s.repo.CreateCategory(newData)
+	if err != nil {
+		return nil, err
+	}
+	return createdCategory, nil
 }

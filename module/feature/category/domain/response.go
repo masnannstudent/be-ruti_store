@@ -29,3 +29,13 @@ func ResponseArrayCategories(data []*entities.CategoryModels) []*CategoriesRespo
 
 	return res
 }
+
+func CategoryFormatter(category *entities.CategoryModels) *CategoriesResponse {
+	return &CategoriesResponse{
+		ID:          category.ID,
+		Name:        category.Name,
+		Description: category.Description,
+		Photo:       category.Photo,
+		CreatedAt:   category.CreatedAt,
+	}
+}

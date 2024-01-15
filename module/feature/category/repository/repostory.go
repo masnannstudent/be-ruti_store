@@ -48,3 +48,11 @@ func (r *CategoryRepository) GetCategoryByID(categoryID uint64) (*entities.Categ
 	}
 	return category, nil
 }
+
+func (r *CategoryRepository) CreateCategory(category *entities.CategoryModels) (*entities.CategoryModels, error) {
+	err := r.db.Create(&category).Error
+	if err != nil {
+		return nil, err
+	}
+	return category, nil
+}
