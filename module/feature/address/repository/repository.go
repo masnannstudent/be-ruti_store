@@ -4,15 +4,18 @@ import (
 	"gorm.io/gorm"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/address/domain"
+	"ruti-store/utils/shipping"
 )
 
 type AddressRepository struct {
-	db *gorm.DB
+	db       *gorm.DB
+	shipping shipping.ShippingServiceInterface
 }
 
-func NewAddressRepository(db *gorm.DB) domain.AddressRepositoryInterface {
+func NewAddressRepository(db *gorm.DB, shipping shipping.ShippingServiceInterface) domain.AddressRepositoryInterface {
 	return &AddressRepository{
-		db: db,
+		db:       db,
+		shipping: shipping,
 	}
 }
 
@@ -47,4 +50,45 @@ func (r *AddressRepository) GetPaginatedAddresses(userID uint64, page, pageSize 
 		return nil, err
 	}
 	return addresses, nil
+}
+
+func (r *AddressRepository) CreateAddress(newData *entities.AddressModels) (*entities.AddressModels, error) {
+	if err := r.db.Create(newData).Error; err != nil {
+		return nil, err
+	}
+	return newData, nil
+}
+
+func (r *AddressRepository) GetPrimaryAddressByUserID(userID uint64) (*entities.AddressModels, error) {
+	var addresses *entities.AddressModels
+	err := r.db.Where("user_id = ? AND is_primary = ? AND deleted_at IS NULL", userID, true).First(&addresses).Error
+	if err != nil {
+		return nil, err
+	}
+	return addresses, nil
+}
+
+func (r *AddressRepository) UpdateIsPrimary(addressID uint64, isPrimary bool) error {
+	var addresses *entities.AddressModels
+	err := r.db.Model(&addresses).Where("id = ?", addressID).Update("is_primary", isPrimary).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *AddressRepository) GetProvince() (map[string]interface{}, error) {
+	result, err := r.shipping.GetProvince()
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (r *AddressRepository) GetCity(province string) (map[string]interface{}, error) {
+	result, err := r.shipping.GetCity(province)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

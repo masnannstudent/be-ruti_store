@@ -6,6 +6,7 @@ import (
 	"github.com/midtrans/midtrans-go/snap"
 	"gorm.io/gorm"
 	"ruti-store/module/feature/middleware"
+	"ruti-store/utils/shipping"
 	"ruti-store/utils/token"
 
 	address "ruti-store/module/feature/address/domain"
@@ -36,13 +37,15 @@ var (
 	addressServ   address.AddressServiceInterface
 	userRepo      user.UserRepositoryInterface
 	userServ      user.UserServiceInterface
+	ship          shipping.ShippingServiceInterface
 )
 
 func InitializeOrder(db *gorm.DB, snapClient snap.Client, coreClient coreapi.Client) {
 	productRepo = productRepository.NewProductRepository(db)
 	productServ = productService.NewProductService(productRepo)
 	uuidGenerator = generator2.NewGeneratorUUID(db)
-	addressRepo = addressRepository.NewAddressRepository(db)
+	ship = shipping.NewShippingService()
+	addressRepo = addressRepository.NewAddressRepository(db, ship)
 	addressServ = addressService.NewAddressService(addressRepo)
 	userRepo = userRepository.NewUserRepository(db)
 	userServ = userService.NewUserService(userRepo)
@@ -54,8 +57,8 @@ func InitializeOrder(db *gorm.DB, snapClient snap.Client, coreClient coreapi.Cli
 
 func SetupOrderRoutes(app *fiber.App, jwt token.JWTInterface, userService user.UserServiceInterface) {
 	api := app.Group("/api/v1/order")
-	api.Get("/payment", middleware.AuthMiddleware(jwt, userService), orderHand.GetAllPayment)
-	api.Get("", middleware.AuthMiddleware(jwt, userService), orderHand.GetAllOrders)
+	api.Get("/payment/list", middleware.AuthMiddleware(jwt, userService), orderHand.GetAllPayment)
+	api.Get("/list", middleware.AuthMiddleware(jwt, userService), orderHand.GetAllOrders)
 	api.Post("/create", middleware.AuthMiddleware(jwt, userService), orderHand.CreateOrder)
 	api.Post("/callback", orderHand.Callback)
 }

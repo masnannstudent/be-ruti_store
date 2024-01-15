@@ -18,6 +18,7 @@ type Config struct {
 	CCAPIKey    string
 	CCAPISecret string
 	CCFolder    string
+	OngkirKey   string
 }
 
 func InitConfig() *Config {
@@ -73,6 +74,9 @@ func loadConfig() *Config {
 	}
 	if value, found := os.LookupEnv("CCFOLDER"); found {
 		res.CCFolder = value
+	}
+	if value, found := os.LookupEnv("ONGKIRKEY"); found {
+		res.OngkirKey = value
 	}
 
 	return res
