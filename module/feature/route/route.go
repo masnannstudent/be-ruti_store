@@ -6,6 +6,7 @@ import (
 	"github.com/midtrans/midtrans-go/snap"
 	"gorm.io/gorm"
 	"ruti-store/module/feature/address"
+	"ruti-store/module/feature/article"
 	"ruti-store/module/feature/auth"
 	"ruti-store/module/feature/category"
 	"ruti-store/module/feature/home"
@@ -35,5 +36,6 @@ func SetupRoutes(app *fiber.App, db *gorm.DB, jwt token.JWTInterface,
 	category.SetupRoutesCategory(app, jwt, userService)
 	review.InitializeReviews(db)
 	review.SetupRoutesReviews(app, jwt, userService)
-
+	article.InitializeArticle(db)
+	article.SetupRoutesArticle(app, jwt, userService)
 }
