@@ -48,3 +48,72 @@ func (r *ProductRepository) GetProductByID(productID uint64) (*entities.ProductM
 	}
 	return product, nil
 }
+
+func (r *ProductRepository) CreateProduct(newData *entities.ProductModels, categoryIDs []uint64) (*entities.ProductModels, error) {
+
+	if err := r.db.Create(newData).Error; err != nil {
+		return nil, err
+	}
+
+	if len(categoryIDs) > 0 {
+		categories := make([]entities.CategoryModels, len(categoryIDs))
+		for i, categoryID := range categoryIDs {
+			categories[i] = entities.CategoryModels{ID: categoryID}
+		}
+
+		if err := r.db.Model(newData).Association("Categories").Append(categories); err != nil {
+			return nil, err
+		}
+	}
+
+	return newData, nil
+}
+
+func (r *ProductRepository) UpdateProduct(productID uint64, newData *entities.ProductModels, categoryIDs []uint64) error {
+	var existingProduct *entities.ProductModels
+	if err := r.db.Where("id = ?", productID).First(&existingProduct).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Model(&existingProduct).Updates(newData).Error; err != nil {
+		return err
+	}
+
+	if len(existingProduct.Categories) > 0 {
+		if err := r.db.Model(existingProduct).Association("Categories").Delete(existingProduct.Categories); err != nil {
+			return err
+		}
+	}
+
+	if len(categoryIDs) > 0 {
+		categories := make([]entities.CategoryModels, len(categoryIDs))
+		for i, categoryID := range categoryIDs {
+			categories[i] = entities.CategoryModels{ID: categoryID}
+		}
+
+		if err := r.db.Model(existingProduct).Association("Categories").Replace(categories); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *ProductRepository) DeleteProduct(productID uint64) error {
+	var existingProduct *entities.ProductModels
+	if err := r.db.Where("id = ?", productID).Preload("Categories").First(&existingProduct).Error; err != nil {
+		return err
+	}
+
+	if len(existingProduct.Categories) > 0 {
+		if err := r.db.Model(existingProduct).Association("Categories").Delete(&existingProduct.Categories); err != nil {
+			return err
+		}
+	}
+
+	if err := r.db.Delete(existingProduct).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

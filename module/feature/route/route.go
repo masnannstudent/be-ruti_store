@@ -21,7 +21,7 @@ func SetupRoutes(app *fiber.App, db *gorm.DB, jwt token.JWTInterface,
 	auth.InitializeAuth(db)
 	auth.SetupRoutesAuth(app)
 	product.InitializeProduct(db)
-	product.SetupRoutesProduct(app)
+	product.SetupRoutesProduct(app, jwt, userService)
 	order.InitializeOrder(db, snapClient, coreClient)
 	order.SetupOrderRoutes(app, jwt, userService)
 	address.InitializeAddress(db)

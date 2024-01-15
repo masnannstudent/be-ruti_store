@@ -1,9 +1,11 @@
 package service
 
 import (
+	"errors"
 	"math"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/product/domain"
+	"time"
 )
 
 type ProductService struct {
@@ -57,4 +59,55 @@ func (s *ProductService) GetProductByID(productID uint64) (*entities.ProductMode
 		return nil, err
 	}
 	return result, nil
+}
+
+func (s *ProductService) CreateProduct(req *domain.CreateProductRequest) (*entities.ProductModels, error) {
+	newProduct := &entities.ProductModels{
+		Name:        req.Name,
+		Price:       req.Price,
+		Description: req.Description,
+		Discount:    req.Discount,
+		Stock:       req.Stock,
+		CreatedAt:   time.Now(),
+	}
+
+	result, err := s.repo.CreateProduct(newProduct, req.CategoryID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (s *ProductService) UpdateProduct(productID uint64, req *domain.UpdateProductRequest) error {
+	product, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	newData := &entities.ProductModels{
+		Name:        req.Name,
+		Price:       req.Price,
+		Description: req.Description,
+		Discount:    req.Discount,
+		Stock:       req.Stock,
+		UpdatedAt:   time.Now(),
+	}
+
+	err = s.repo.UpdateProduct(product.ID, newData, req.CategoryID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (s *ProductService) DeleteProduct(productID uint64) error {
+	product, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	err = s.repo.DeleteProduct(product.ID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
