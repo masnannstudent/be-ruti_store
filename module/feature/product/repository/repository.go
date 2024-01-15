@@ -117,3 +117,29 @@ func (r *ProductRepository) DeleteProduct(productID uint64) error {
 
 	return nil
 }
+
+func (r *ProductRepository) UpdateTotalReview(productID uint64) error {
+	var products *entities.ProductModels
+	err := r.db.Model(&products).Where("id = ?", productID).UpdateColumn("total_reviews", gorm.Expr("total_reviews + ?", 1)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *ProductRepository) UpdateProductRating(productID uint64, newRating float64) error {
+	if err := r.db.Model(&entities.ProductModels{}).Where("id = ?", productID).Update("rating", newRating).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *ProductRepository) GetProductReviews(page, perPage int) ([]*entities.ProductModels, error) {
+	var products []*entities.ProductModels
+	offset := (page - 1) * perPage
+	err := r.db.Where("deleted_at IS NULL").Offset(offset).Limit(perPage).Find(&products).Error
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
+}

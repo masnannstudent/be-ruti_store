@@ -4,24 +4,24 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"mime/multipart"
 	"ruti-store/module/entities"
-	"ruti-store/module/feature/category/domain"
+	"ruti-store/module/feature/article/domain"
 	"ruti-store/utils/response"
 	"ruti-store/utils/upload"
 	"ruti-store/utils/validator"
 	"strconv"
 )
 
-type CategoryHandler struct {
-	service domain.CategoryServiceInterface
+type ArticleHandler struct {
+	service domain.ArticleServiceInterface
 }
 
-func NewCategoryHandler(service domain.CategoryServiceInterface) domain.CategoryHandlerInterface {
-	return &CategoryHandler{
+func NewArticleHandler(service domain.ArticleServiceInterface) domain.ArticleHandlerInterface {
+	return &ArticleHandler{
 		service: service,
 	}
 }
 
-func (h *CategoryHandler) GetAllCategories(c *fiber.Ctx) error {
+func (h *ArticleHandler) GetAllArticles(c *fiber.Ctx) error {
 	currentPage, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page number")
@@ -32,46 +32,42 @@ func (h *CategoryHandler) GetAllCategories(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
 	}
 
-	result, totalItems, err := h.service.GetAllCategories(currentPage, pageSize)
+	result, totalItems, err := h.service.GetAllArticles(currentPage, pageSize)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
-	currentPage, totalPages, nextPage, prevPage, err := h.service.GetCategoriesPage(currentPage, pageSize)
+	currentPage, totalPages, nextPage, prevPage, err := h.service.GetArticlesPage(currentPage, pageSize)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
 	}
 
 	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
-		domain.ResponseArrayCategories(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
+		domain.ResponseArrayArticles(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
 }
 
-func (h *CategoryHandler) GetCategoryByID(c *fiber.Ctx) error {
+func (h *ArticleHandler) GetArticleByID(c *fiber.Ctx) error {
 	id := c.Params("id")
-	categoryID, err := strconv.ParseUint(id, 10, 64)
+	articleID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
 	}
 
-	result, err := h.service.GetCategoryByID(categoryID)
+	result, err := h.service.GetArticleByID(articleID)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
-	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved category by ID", result)
+	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved article by ID", domain.ArticleDetailFormatter(result))
 }
 
-func (h *CategoryHandler) CreateCategory(c *fiber.Ctx) error {
+func (h *ArticleHandler) CreateArticle(c *fiber.Ctx) error {
 	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
 	if !ok || currentUser == nil {
 		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
 	}
 
-	if currentUser.Role != "admin" {
-		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
-	}
-
-	req := new(domain.CreateCategoryRequest)
+	req := new(domain.CreateArticleRequest)
 	file, err := c.FormFile("photo")
 	var uploadedURL string
 	if err == nil {
@@ -99,31 +95,32 @@ func (h *CategoryHandler) CreateCategory(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	result, err := h.service.CreateCategory(req)
+	result, err := h.service.CreateArticle(req)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
-	return response.SuccessBuildResponse(c, fiber.StatusCreated, "Success create category", domain.CategoryFormatter(result))
+	return response.SuccessBuildResponse(c, fiber.StatusCreated, "Success create article", domain.ArticleDetailFormatter(result))
 }
 
-func (h *CategoryHandler) UpdateCategory(c *fiber.Ctx) error {
+func (h *ArticleHandler) UpdateArticle(c *fiber.Ctx) error {
 	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
 	if !ok || currentUser == nil {
 		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
 	}
 
+	// Check if the user is an admin
 	if currentUser.Role != "admin" {
 		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
 	}
 
 	id := c.Params("id")
-	categoryID, err := strconv.ParseUint(id, 10, 64)
+	articleID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
 	}
 
-	req := new(domain.UpdateCategoryRequest)
+	req := new(domain.UpdateArticleRequest)
 
 	file, err := c.FormFile("photo")
 	var uploadedURL string
@@ -152,34 +149,35 @@ func (h *CategoryHandler) UpdateCategory(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	err = h.service.UpdateCategory(categoryID, req)
+	err = h.service.UpdateArticle(articleID, req)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
-	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success update category")
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success update article")
 }
 
-func (h *CategoryHandler) DeleteCategory(c *fiber.Ctx) error {
+func (h *ArticleHandler) DeleteArticle(c *fiber.Ctx) error {
 	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
 	if !ok || currentUser == nil {
 		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
 	}
 
+	// Check if the user is an admin
 	if currentUser.Role != "admin" {
 		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
 	}
 
 	id := c.Params("id")
-	categoryID, err := strconv.ParseUint(id, 10, 64)
+	articleID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
 	}
 
-	err = h.service.DeleteCategory(categoryID)
+	err = h.service.DeleteArticle(articleID)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
-	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success delete category")
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success delete article")
 }
