@@ -45,3 +45,20 @@ func ResponseArrayAddresses(data []*entities.AddressModels) []*AddressResponse {
 
 	return res
 }
+
+func AddressFormatter(address *entities.AddressModels) *AddressResponse {
+	addressFormatter := &AddressResponse{
+		ID:           address.ID,
+		UserID:       address.UserID,
+		AcceptedName: address.AcceptedName,
+		Phone:        address.Phone,
+		ProvinceID:   address.ProvinceID,
+		ProvinceName: address.ProvinceName,
+		CityID:       address.CityID,
+		CityName:     address.CityName,
+		Address:      address.Address,
+		IsPrimary:    address.IsPrimary,
+		CreatedAt:    address.CreatedAt,
+	}
+	return addressFormatter
+}
