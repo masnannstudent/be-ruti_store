@@ -29,9 +29,9 @@ func InitializeAddress(db *gorm.DB) {
 
 func SetupRoutesAddress(app *fiber.App, jwt token.JWTInterface, userService user.UserServiceInterface) {
 	api := app.Group("/api/v1/address")
-	api.Get("", middleware.AuthMiddleware(jwt, userService), hand.GetAllAddresses)
-	api.Get("/:id", middleware.AuthMiddleware(jwt, userService), hand.GetAddressByID)
-	api.Post("", middleware.AuthMiddleware(jwt, userService), hand.CreateAddress)
-	api.Post("/get-province", middleware.AuthMiddleware(jwt, userService), hand.GetProvince)
-	api.Post("/get-city", middleware.AuthMiddleware(jwt, userService), hand.GetCity)
+	api.Get("/list", middleware.AuthMiddleware(jwt, userService), hand.GetAllAddresses)
+	api.Get("/details/:id", middleware.AuthMiddleware(jwt, userService), hand.GetAddressByID)
+	api.Post("/create", middleware.AuthMiddleware(jwt, userService), hand.CreateAddress)
+	api.Get("/get-province", middleware.AuthMiddleware(jwt, userService), hand.GetProvince)
+	api.Get("/get-city", middleware.AuthMiddleware(jwt, userService), hand.GetCity)
 }

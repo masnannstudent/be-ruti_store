@@ -23,6 +23,6 @@ func InitializeProduct(db *gorm.DB) {
 
 func SetupRoutesProduct(app *fiber.App) {
 	api := app.Group("/api/v1/product")
-	api.Get("", hand.GetAllProducts)
-	api.Get("/:id", hand.GetProductByID)
+	api.Get("/list", hand.GetAllProducts)
+	api.Get("/details/:id", hand.GetProductByID)
 }

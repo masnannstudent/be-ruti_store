@@ -57,8 +57,8 @@ func InitializeOrder(db *gorm.DB, snapClient snap.Client, coreClient coreapi.Cli
 
 func SetupOrderRoutes(app *fiber.App, jwt token.JWTInterface, userService user.UserServiceInterface) {
 	api := app.Group("/api/v1/order")
-	api.Get("/payment", middleware.AuthMiddleware(jwt, userService), orderHand.GetAllPayment)
-	api.Get("", middleware.AuthMiddleware(jwt, userService), orderHand.GetAllOrders)
+	api.Get("/payment/list", middleware.AuthMiddleware(jwt, userService), orderHand.GetAllPayment)
+	api.Get("/list", middleware.AuthMiddleware(jwt, userService), orderHand.GetAllOrders)
 	api.Post("/create", middleware.AuthMiddleware(jwt, userService), orderHand.CreateOrder)
 	api.Post("/callback", orderHand.Callback)
 }
