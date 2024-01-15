@@ -159,3 +159,27 @@ func (h *CategoryHandler) UpdateCategory(c *fiber.Ctx) error {
 
 	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success update category")
 }
+
+func (h *CategoryHandler) DeleteCategory(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+
+	id := c.Params("id")
+	categoryID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	err = h.service.DeleteCategory(categoryID)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to delete category: "+err.Error())
+	}
+
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success delete category")
+}

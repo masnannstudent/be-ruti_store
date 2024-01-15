@@ -20,6 +20,7 @@ type CategoryServiceInterface interface {
 	GetCategoryByID(categoryID uint64) (*entities.CategoryModels, error)
 	CreateCategory(req *CreateCategoryRequest) (*entities.CategoryModels, error)
 	UpdateCategory(categoryID uint64, req *UpdateCategoryRequest) error
+	DeleteCategory(categoryID uint64) error
 }
 
 type CategoryHandlerInterface interface {
@@ -27,4 +28,5 @@ type CategoryHandlerInterface interface {
 	GetCategoryByID(c *fiber.Ctx) error
 	CreateCategory(c *fiber.Ctx) error
 	UpdateCategory(c *fiber.Ctx) error
+	DeleteCategory(c *fiber.Ctx) error
 }
