@@ -2,9 +2,11 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"ruti-store/module/entities"
 	address "ruti-store/module/feature/address/domain"
+	notification "ruti-store/module/feature/notification/domain"
 	"ruti-store/module/feature/order/domain"
 	product "ruti-store/module/feature/product/domain"
 	users "ruti-store/module/feature/user/domain"
@@ -13,11 +15,12 @@ import (
 )
 
 type OrderService struct {
-	repo           domain.OrderRepositoryInterface
-	generatorID    generator.GeneratorInterface
-	productService product.ProductServiceInterface
-	addressService address.AddressServiceInterface
-	userService    users.UserServiceInterface
+	repo                domain.OrderRepositoryInterface
+	generatorID         generator.GeneratorInterface
+	productService      product.ProductServiceInterface
+	addressService      address.AddressServiceInterface
+	userService         users.UserServiceInterface
+	notificationService notification.NotificationServiceInterface
 	//cartService    cart.ServiceCartInterface
 }
 
@@ -27,15 +30,17 @@ func NewOrderService(
 	productService product.ProductServiceInterface,
 	addressService address.AddressServiceInterface,
 	userService users.UserServiceInterface,
-	//cartService cart.ServiceCartInterface,
+	notificationService notification.NotificationServiceInterface,
+//cartService cart.ServiceCartInterface,
 
 ) domain.OrderServiceInterface {
 	return &OrderService{
-		repo:           repo,
-		generatorID:    generatorID,
-		productService: productService,
-		addressService: addressService,
-		userService:    userService,
+		repo:                repo,
+		generatorID:         generatorID,
+		productService:      productService,
+		addressService:      addressService,
+		userService:         userService,
+		notificationService: notificationService,
 		//cartService:    cartService,
 	}
 }
@@ -156,6 +161,16 @@ func (s *OrderService) CreateOrder(userID uint64, request *domain.CreateOrderReq
 		return nil, errors.New("gagal mengurangi stok")
 	}
 
+	notificationRequest := domain.CreateNotificationPaymentRequest{
+		OrderID:       createdOrder.ID,
+		UserID:        createdOrder.UserID,
+		PaymentStatus: "Menunggu Konfirmasi",
+	}
+	_, err = s.SendNotificationPayment(notificationRequest)
+	if err != nil {
+		return nil, err
+	}
+
 	response := &domain.CreateOrderResponse{
 		OrderID:         createdOrder.ID,
 		IdOrder:         createdOrder.IdOrder,
@@ -235,4 +250,83 @@ func (s *OrderService) CancelPayment(orderID string) error {
 	}
 
 	return nil
+}
+
+func (s *OrderService) SendNotificationPayment(request domain.CreateNotificationPaymentRequest) (string, error) {
+	var notificationMsg string
+	var err error
+
+	user, err := s.userService.GetUserByID(request.UserID)
+	if err != nil {
+		return "", err
+	}
+	orders, err := s.repo.GetOrderByID(request.OrderID)
+	if err != nil {
+		return "", err
+	}
+
+	switch request.PaymentStatus {
+	case "Menunggu Konfirmasi":
+		notificationMsg = fmt.Sprintf("Alloo, %s! Pesananmu dengan ID %s udah berhasil dibuat, nih. Ditunggu yupp!!", user.Name, orders.IdOrder)
+	case "Konfirmasi":
+		notificationMsg = fmt.Sprintf("Thengkyuu, %s! Pembayaran untuk pesananmu dengan ID %s udah kami terima, nih. Semoga harimu menyenangkan!", user.Name, orders.IdOrder)
+	case "Gagal":
+		notificationMsg = fmt.Sprintf("Maaf, %s. Pembayaran untuk pesanan dengan ID %s gagal, nih. Beritahu kami apabila kamu butuh bantuan yaa!!", user.Name, orders.IdOrder)
+	default:
+		return "", errors.New("Status pesanan tidak valid")
+	}
+	req := &notification.CreateNotificationRequest{
+		UserID:  user.ID,
+		OrderID: orders.IdOrder,
+		Title:   "Status Pembayaran",
+		Message: notificationMsg,
+	}
+	_, err = s.notificationService.CreateNotification(req)
+	if err != nil {
+		return "", errors.New("error send message")
+	}
+
+	return notificationMsg, nil
+}
+
+func (s *OrderService) SendNotificationOrder(request domain.CreateNotificationOrderRequest) (string, error) {
+	var notificationMsg string
+	var err error
+
+	user, err := s.userService.GetUserByID(request.UserID)
+	if err != nil {
+		return "", err
+	}
+	orders, err := s.repo.GetOrderByID(request.OrderID)
+	if err != nil {
+		return "", err
+	}
+
+	switch request.OrderStatus {
+	case "Pengiriman":
+		notificationMsg = fmt.Sprintf("Alloo, %s! Pesanan dengan ID %s udah dalam proses pengiriman, nih. Mohon ditunggu yupp!", user.Name, orders.IdOrder)
+	case "Selesai":
+		notificationMsg = fmt.Sprintf("Yeayy, %s! Pesananmu dengan ID %s udah sampai tujuan, nih. Semoga sukakk yupp!", user.Name, orders.IdOrder)
+	case "Menunggu Konfirmasi":
+		notificationMsg = fmt.Sprintf("Alloo, %s! Pesananmu dengan ID %s sedang menunggu konfirmasi, nih. Ditunggu yupp!", user.Name, orders.IdOrder)
+	case "Proses":
+		notificationMsg = fmt.Sprintf("Alloo, %s! Pesananmu dengan ID %s sedang dalam proses, nih. Ditunggu yupp!", user.Name, orders.IdOrder)
+	case "Gagal":
+		notificationMsg = fmt.Sprintf("Sowwy, %s. Pesananmu dengan ID %s gagal. Coba lagi, yukk!", user.Name, orders.IdOrder)
+	default:
+		return "", errors.New("Status pengiriman tidak valid")
+	}
+
+	req := &notification.CreateNotificationRequest{
+		UserID:  user.ID,
+		OrderID: orders.IdOrder,
+		Title:   "Status Pesanan",
+		Message: notificationMsg,
+	}
+	_, err = s.notificationService.CreateNotification(req)
+	if err != nil {
+		return "", errors.New("error send message")
+	}
+
+	return notificationMsg, nil
 }
