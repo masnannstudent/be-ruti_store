@@ -220,3 +220,42 @@ func (h *ProductHandler) AddPhotoProduct(c *fiber.Ctx) error {
 
 	return response.SuccessBuildResponse(c, fiber.StatusCreated, "Success add photo product", domain.ResponseAddPhotoProduct(result))
 }
+
+func (h *ProductHandler) UpdatePhotoProduct(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+	id := c.Params("id")
+	productID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+	file, err := c.FormFile("photo")
+	var uploadedURL string
+	if err == nil {
+		fileToUpload, err := file.Open()
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Error opening file: "+err.Error())
+		}
+		defer func(fileToUpload multipart.File) {
+			_ = fileToUpload.Close()
+		}(fileToUpload)
+
+		uploadedURL, err = upload.ImageUploadHelper(fileToUpload)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Error uploading file: "+err.Error())
+		}
+	}
+
+	err = h.service.UpdatePhotoProduct(productID, uploadedURL)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusCreated, "Success update photo product")
+}

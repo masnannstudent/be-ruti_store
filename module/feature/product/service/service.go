@@ -166,3 +166,17 @@ func (s *ProductService) AddPhotoProducts(req *domain.AddPhotoProductRequest) (*
 	}
 	return result, nil
 }
+
+func (s *ProductService) UpdatePhotoProduct(productID uint64, photo string) error {
+	products, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	err = s.repo.UpdateProductPhoto(products.ID, photo)
+	if err != nil {
+		return errors.New("failed to update total reviews")
+	}
+
+	return nil
+}

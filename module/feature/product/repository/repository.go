@@ -151,3 +151,20 @@ func (r *ProductRepository) AddPhotoProduct(newData *entities.ProductPhotoModels
 	}
 	return newData, nil
 }
+
+func (r *ProductRepository) UpdateProductPhoto(productID uint64, newPhotoURL string) error {
+	if err := r.db.Where("product_id = ?", productID).Delete(&entities.ProductPhotoModels{}).Error; err != nil {
+		return err
+	}
+
+	newPhoto := &entities.ProductPhotoModels{
+		ProductID: productID,
+		URL:       newPhotoURL,
+	}
+
+	if err := r.db.Create(newPhoto).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

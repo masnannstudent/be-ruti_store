@@ -25,3 +25,8 @@ type AddPhotoProductRequest struct {
 	ProductID uint64 `form:"product_id" json:"product_id" validate:"required"`
 	Photo     string `form:"photo" json:"photo"`
 }
+
+type UpdatePhotoProductRequest struct {
+	ProductID uint64 `form:"product_id" json:"product_id" validate:"required"`
+	Photo     string `form:"photo" json:"photo"`
+}
