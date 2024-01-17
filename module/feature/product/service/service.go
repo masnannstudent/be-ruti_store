@@ -180,3 +180,32 @@ func (s *ProductService) UpdatePhotoProduct(productID uint64, photo string) erro
 
 	return nil
 }
+
+func (s *ProductService) ReduceStockWhenPurchasing(productID, quantity uint64) error {
+	products, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	if products.Stock < quantity {
+		return errors.New("stock not enough")
+	}
+
+	if err := s.repo.ReduceStockWhenPurchasing(products.ID, quantity); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *ProductService) IncreaseStock(productID, quantity uint64) error {
+	products, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	err = s.repo.IncreaseStock(products.ID, quantity)
+	if err != nil {
+		return err
+	}
+	return nil
+}
