@@ -17,6 +17,8 @@ type ProductRepositoryInterface interface {
 	GetProductReviews(page, perPage int) ([]*entities.ProductModels, error)
 	AddPhotoProduct(newData *entities.ProductPhotoModels) (*entities.ProductPhotoModels, error)
 	UpdateProductPhoto(productID uint64, newPhotoURL string) error
+	ReduceStockWhenPurchasing(productID, quantity uint64) error
+	IncreaseStock(productID, quantity uint64) error
 }
 
 type ProductServiceInterface interface {
@@ -31,6 +33,8 @@ type ProductServiceInterface interface {
 	GetProductReviews(page, perPage int) ([]*entities.ProductModels, int64, error)
 	AddPhotoProducts(req *AddPhotoProductRequest) (*entities.ProductPhotoModels, error)
 	UpdatePhotoProduct(productID uint64, photo string) error
+	ReduceStockWhenPurchasing(productID, quantity uint64) error
+	IncreaseStock(productID, quantity uint64) error
 }
 
 type ProductHandlerInterface interface {
