@@ -20,3 +20,8 @@ type UpdateProductRequest struct {
 	Weight      uint64   `json:"weight"`
 	CategoryID  []uint64 `json:"category_id"`
 }
+
+type AddPhotoProductRequest struct {
+	ProductID uint64 `form:"product_id" json:"product_id" validate:"required"`
+	Photo     string `form:"photo" json:"photo"`
+}

@@ -95,3 +95,18 @@ func ResponseArrayProductReviews(products []*entities.ProductModels) []*ReviewPr
 	}
 	return productFormatters
 }
+
+type AddPhotoProductResponse struct {
+	ID        uint64 `json:"id"`
+	ProductID uint64 `json:"product_id"`
+	Photo     string `json:"photo"`
+}
+
+func ResponseAddPhotoProduct(data *entities.ProductPhotoModels) *AddPhotoProductResponse {
+	res := &AddPhotoProductResponse{
+		ID:        data.ID,
+		ProductID: data.ProductID,
+		Photo:     data.URL,
+	}
+	return res
+}

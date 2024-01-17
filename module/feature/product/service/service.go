@@ -149,3 +149,20 @@ func (s *ProductService) GetProductReviews(page, perPage int) ([]*entities.Produ
 
 	return products, totalItems, nil
 }
+
+func (s *ProductService) AddPhotoProducts(req *domain.AddPhotoProductRequest) (*entities.ProductPhotoModels, error) {
+	product, err := s.repo.GetProductByID(req.ProductID)
+	if err != nil {
+		return nil, errors.New("product not found")
+	}
+	newData := &entities.ProductPhotoModels{
+		ProductID: product.ID,
+		URL:       req.Photo,
+	}
+
+	result, err := s.repo.AddPhotoProduct(newData)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}

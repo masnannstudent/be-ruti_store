@@ -144,3 +144,10 @@ func (r *ProductRepository) GetProductReviews(page, perPage int) ([]*entities.Pr
 	}
 	return products, nil
 }
+
+func (r *ProductRepository) AddPhotoProduct(newData *entities.ProductPhotoModels) (*entities.ProductPhotoModels, error) {
+	if err := r.db.Create(newData).Error; err != nil {
+		return nil, err
+	}
+	return newData, nil
+}
