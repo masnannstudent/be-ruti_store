@@ -68,6 +68,7 @@ func (s *ProductService) CreateProduct(req *domain.CreateProductRequest) (*entit
 		Description: req.Description,
 		Discount:    req.Discount,
 		Stock:       req.Stock,
+		Weight:      req.Weight,
 		CreatedAt:   time.Now(),
 	}
 
@@ -90,6 +91,7 @@ func (s *ProductService) UpdateProduct(productID uint64, req *domain.UpdateProdu
 		Description: req.Description,
 		Discount:    req.Discount,
 		Stock:       req.Stock,
+		Weight:      req.Weight,
 		UpdatedAt:   time.Now(),
 	}
 
@@ -146,4 +148,64 @@ func (s *ProductService) GetProductReviews(page, perPage int) ([]*entities.Produ
 	}
 
 	return products, totalItems, nil
+}
+
+func (s *ProductService) AddPhotoProducts(req *domain.AddPhotoProductRequest) (*entities.ProductPhotoModels, error) {
+	product, err := s.repo.GetProductByID(req.ProductID)
+	if err != nil {
+		return nil, errors.New("product not found")
+	}
+	newData := &entities.ProductPhotoModels{
+		ProductID: product.ID,
+		URL:       req.Photo,
+	}
+
+	result, err := s.repo.AddPhotoProduct(newData)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (s *ProductService) UpdatePhotoProduct(productID uint64, photo string) error {
+	products, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	err = s.repo.UpdateProductPhoto(products.ID, photo)
+	if err != nil {
+		return errors.New("failed to update total reviews")
+	}
+
+	return nil
+}
+
+func (s *ProductService) ReduceStockWhenPurchasing(productID, quantity uint64) error {
+	products, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	if products.Stock < quantity {
+		return errors.New("stock not enough")
+	}
+
+	if err := s.repo.ReduceStockWhenPurchasing(products.ID, quantity); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *ProductService) IncreaseStock(productID, quantity uint64) error {
+	products, err := s.repo.GetProductByID(productID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	err = s.repo.IncreaseStock(products.ID, quantity)
+	if err != nil {
+		return err
+	}
+	return nil
 }

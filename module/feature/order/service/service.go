@@ -152,6 +152,10 @@ func (s *OrderService) CreateOrder(userID uint64, request *domain.CreateOrderReq
 		return nil, err
 	}
 
+	if err := s.productService.ReduceStockWhenPurchasing(request.ProductID, request.Quantity); err != nil {
+		return nil, errors.New("gagal mengurangi stok")
+	}
+
 	response := &domain.CreateOrderResponse{
 		OrderID:         createdOrder.ID,
 		IdOrder:         createdOrder.IdOrder,
@@ -222,6 +226,12 @@ func (s *OrderService) CancelPayment(orderID string) error {
 
 	if err := s.repo.UpdatePayment(orderID, orders.OrderStatus, orders.PaymentStatus); err != nil {
 		return err
+	}
+
+	for _, orderDetail := range orders.OrderDetails {
+		if err := s.productService.IncreaseStock(orderDetail.ProductID, orderDetail.Quantity); err != nil {
+			return errors.New("failed to increase stock")
+		}
 	}
 
 	return nil

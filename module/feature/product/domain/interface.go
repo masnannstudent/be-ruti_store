@@ -15,6 +15,10 @@ type ProductRepositoryInterface interface {
 	UpdateTotalReview(productID uint64) error
 	UpdateProductRating(productID uint64, newRating float64) error
 	GetProductReviews(page, perPage int) ([]*entities.ProductModels, error)
+	AddPhotoProduct(newData *entities.ProductPhotoModels) (*entities.ProductPhotoModels, error)
+	UpdateProductPhoto(productID uint64, newPhotoURL string) error
+	ReduceStockWhenPurchasing(productID, quantity uint64) error
+	IncreaseStock(productID, quantity uint64) error
 }
 
 type ProductServiceInterface interface {
@@ -27,6 +31,10 @@ type ProductServiceInterface interface {
 	UpdateTotalReview(productID uint64) error
 	UpdateProductRating(productID uint64, newRating float64) error
 	GetProductReviews(page, perPage int) ([]*entities.ProductModels, int64, error)
+	AddPhotoProducts(req *AddPhotoProductRequest) (*entities.ProductPhotoModels, error)
+	UpdatePhotoProduct(productID uint64, photo string) error
+	ReduceStockWhenPurchasing(productID, quantity uint64) error
+	IncreaseStock(productID, quantity uint64) error
 }
 
 type ProductHandlerInterface interface {
@@ -36,4 +44,6 @@ type ProductHandlerInterface interface {
 	UpdateProduct(c *fiber.Ctx) error
 	DeleteProduct(c *fiber.Ctx) error
 	GetAllProductsReview(c *fiber.Ctx) error
+	AddPhotoProduct(c *fiber.Ctx) error
+	UpdatePhotoProduct(c *fiber.Ctx) error
 }

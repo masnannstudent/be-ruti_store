@@ -33,6 +33,7 @@ func (r *ProductRepository) GetPaginatedProducts(page, pageSize int) ([]*entitie
 	offset := (page - 1) * pageSize
 
 	if err := r.db.Where("deleted_at IS NULL").
+		Order("created_at DESC").
 		Offset(offset).Limit(pageSize).Preload("Photos").Find(&products).Error; err != nil {
 		return nil, err
 	}
@@ -142,4 +143,44 @@ func (r *ProductRepository) GetProductReviews(page, perPage int) ([]*entities.Pr
 		return nil, err
 	}
 	return products, nil
+}
+
+func (r *ProductRepository) AddPhotoProduct(newData *entities.ProductPhotoModels) (*entities.ProductPhotoModels, error) {
+	if err := r.db.Create(newData).Error; err != nil {
+		return nil, err
+	}
+	return newData, nil
+}
+
+func (r *ProductRepository) UpdateProductPhoto(productID uint64, newPhotoURL string) error {
+	if err := r.db.Where("product_id = ?", productID).Delete(&entities.ProductPhotoModels{}).Error; err != nil {
+		return err
+	}
+
+	newPhoto := &entities.ProductPhotoModels{
+		ProductID: productID,
+		URL:       newPhotoURL,
+	}
+
+	if err := r.db.Create(newPhoto).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *ProductRepository) ReduceStockWhenPurchasing(productID, quantity uint64) error {
+	var products entities.ProductModels
+	if err := r.db.Model(&products).Where("id = ?", productID).Update("stock", gorm.Expr("stock - ?", quantity)).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *ProductRepository) IncreaseStock(productID, quantity uint64) error {
+	var products entities.ProductModels
+	if err := r.db.Model(&products).Where("id = ?", productID).Update("stock", gorm.Expr("stock + ?", quantity)).Error; err != nil {
+		return err
+	}
+	return nil
 }
