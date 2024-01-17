@@ -77,7 +77,7 @@ func (r *ReviewRepository) CreateReviewImages(newData *entities.ReviewPhotoModel
 func (r *ReviewRepository) CountAverageRating(productID uint64) (float64, error) {
 	var averageRating float64
 
-	query := "SELECT AVG(rating) FROM reviews WHERE product_id = ?"
+	query := "SELECT ROUND(AVG(rating), 1) FROM reviews WHERE product_id = ?"
 	if err := r.db.Raw(query, productID).Scan(&averageRating).Error; err != nil {
 		return 0, err
 	}

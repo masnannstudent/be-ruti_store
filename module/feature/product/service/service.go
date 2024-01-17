@@ -68,6 +68,7 @@ func (s *ProductService) CreateProduct(req *domain.CreateProductRequest) (*entit
 		Description: req.Description,
 		Discount:    req.Discount,
 		Stock:       req.Stock,
+		Weight:      req.Weight,
 		CreatedAt:   time.Now(),
 	}
 
@@ -90,6 +91,7 @@ func (s *ProductService) UpdateProduct(productID uint64, req *domain.UpdateProdu
 		Description: req.Description,
 		Discount:    req.Discount,
 		Stock:       req.Stock,
+		Weight:      req.Weight,
 		UpdatedAt:   time.Now(),
 	}
 

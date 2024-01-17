@@ -33,6 +33,7 @@ func (r *ProductRepository) GetPaginatedProducts(page, pageSize int) ([]*entitie
 	offset := (page - 1) * pageSize
 
 	if err := r.db.Where("deleted_at IS NULL").
+		Order("created_at DESC").
 		Offset(offset).Limit(pageSize).Preload("Photos").Find(&products).Error; err != nil {
 		return nil, err
 	}

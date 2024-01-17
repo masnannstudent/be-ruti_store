@@ -14,6 +14,7 @@ type ProductsResponse struct {
 	Rating       float64                `json:"rating"`
 	TotalReviews uint64                 `json:"total_reviews"`
 	Stock        uint64                 `json:"stock"`
+	Weight       uint64                 `json:"weight"`
 	CreatedAt    time.Time              `json:"created_at"`
 	Photos       []ProductPhotoResponse `json:"photos"`
 }
@@ -33,6 +34,7 @@ func ResponseDetailProducts(data *entities.ProductModels) *ProductsResponse {
 		Rating:       data.Rating,
 		TotalReviews: data.TotalReviews,
 		Stock:        data.Stock,
+		Weight:       data.Weight,
 		CreatedAt:    data.CreatedAt,
 		Photos:       getPhotoResponses(data.Photos),
 	}
@@ -52,6 +54,7 @@ func ResponseArrayProducts(data []*entities.ProductModels) []*ProductsResponse {
 			Rating:       product.Rating,
 			TotalReviews: product.TotalReviews,
 			Stock:        product.Stock,
+			Weight:       product.Weight,
 			CreatedAt:    product.CreatedAt,
 			Photos:       getPhotoResponses(product.Photos),
 		}
