@@ -10,6 +10,7 @@ import (
 	"ruti-store/module/feature/auth"
 	"ruti-store/module/feature/category"
 	"ruti-store/module/feature/home"
+	"ruti-store/module/feature/notification"
 	"ruti-store/module/feature/order"
 	"ruti-store/module/feature/product"
 	"ruti-store/module/feature/review"
@@ -38,4 +39,6 @@ func SetupRoutes(app *fiber.App, db *gorm.DB, jwt token.JWTInterface,
 	review.SetupRoutesReviews(app, jwt, userService)
 	article.InitializeArticle(db)
 	article.SetupRoutesArticle(app, jwt, userService)
+	notification.InitializeNotification(db)
+	notification.SetupRoutesNotification(app, jwt, userService)
 }

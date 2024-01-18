@@ -17,7 +17,8 @@ func Migrate(db *gorm.DB) {
 		entities.CarouselModels{},
 		entities.ReviewModels{},
 		entities.ReviewPhotoModels{},
-		entities.ArticleModels{})
+		entities.ArticleModels{},
+		entities.NotificationModels{})
 
 	if err != nil {
 		return
