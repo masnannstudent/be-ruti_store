@@ -138,3 +138,11 @@ func (r *OrderRepository) GetCartByID(cartID uint64) (*entities.CartModels, erro
 	}
 	return carts, nil
 }
+
+func (r *OrderRepository) GetCartByUserID(userID uint64) ([]*entities.CartModels, error) {
+	var carts []*entities.CartModels
+	if err := r.db.Where("user_id = ?", userID).Find(&carts).Error; err != nil {
+		return nil, err
+	}
+	return carts, nil
+}

@@ -177,3 +177,20 @@ func (h *OrderHandler) DeleteCart(c *fiber.Ctx) error {
 	}
 	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Cart deleted successfully")
 }
+
+func (h *OrderHandler) GetCartUser(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "customer" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only customer users can access this resource.")
+	}
+
+	result, err := h.service.GetCartUser(currentUser.ID)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved get cart", domain.ResponseArrayCart(result))
+}

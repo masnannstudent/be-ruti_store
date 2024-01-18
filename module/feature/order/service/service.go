@@ -399,3 +399,16 @@ func (s *OrderService) DeleteCartItems(cartID uint64) error {
 
 	return nil
 }
+
+func (s *OrderService) GetCartUser(userID uint64) ([]*entities.CartModels, error) {
+	user, err := s.userService.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.repo.GetCartByUserID(user.ID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+
+}

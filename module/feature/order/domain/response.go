@@ -265,3 +265,26 @@ func CreateCartFormatter(cart *entities.CartModels) *CreateCartResponse {
 		Quantity:  cart.Quantity,
 	}
 }
+
+type CartResponse struct {
+	ID        uint64 `json:"id"`
+	UserID    uint64 `json:"user_id"`
+	ProductID uint64 `json:"product_id"`
+	Quantity  uint64 `json:"quantity"`
+}
+
+func ResponseArrayCart(data []*entities.CartModels) []*CartResponse {
+	res := make([]*CartResponse, 0)
+
+	for _, cart := range data {
+		cartRes := &CartResponse{
+			ID:        cart.ID,
+			UserID:    cart.UserID,
+			ProductID: cart.ProductID,
+			Quantity:  cart.Quantity,
+		}
+		res = append(res, cartRes)
+	}
+
+	return res
+}
