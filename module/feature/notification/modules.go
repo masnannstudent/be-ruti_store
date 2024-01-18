@@ -3,6 +3,7 @@ package notification
 import (
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"ruti-store/module/feature/middleware"
 	"ruti-store/module/feature/notification/domain"
 	"ruti-store/module/feature/notification/handler"
 	"ruti-store/module/feature/notification/repository"
@@ -24,6 +25,6 @@ func InitializeNotification(db *gorm.DB) {
 }
 
 func SetupRoutesNotification(app *fiber.App, jwt token.JWTInterface, userService user.UserServiceInterface) {
-	//api := app.Group("/api/v1/notification")
-	//api.Get("/list", middleware.AuthMiddleware(jwt, userService), hand.GetNotifications)
+	api := app.Group("/api/v1/notification")
+	api.Get("/list", middleware.AuthMiddleware(jwt, userService), hand.GetNotification)
 }

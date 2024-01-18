@@ -23,3 +23,13 @@ func (r *NotificationRepository) CreateNotification(notification *entities.Notif
 	}
 	return notification, nil
 }
+
+func (r *NotificationRepository) GetNotificationUser(userID uint64) ([]*entities.NotificationModels, error) {
+	var notify []*entities.NotificationModels
+	if err := r.db.Where("user_id", userID).
+		Order("created_at DESC").
+		Find(&notify).Error; err != nil {
+		return nil, err
+	}
+	return notify, nil
+}

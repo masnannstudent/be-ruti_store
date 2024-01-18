@@ -30,3 +30,11 @@ func (s *NotificationService) CreateNotification(req *domain.CreateNotificationR
 	}
 	return result, nil
 }
+
+func (s *NotificationService) GetNotificationUser(userID uint64) ([]*entities.NotificationModels, error) {
+	result, err := s.repo.GetNotificationUser(userID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
