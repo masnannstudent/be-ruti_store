@@ -14,6 +14,12 @@ type OrderRepositoryInterface interface {
 	CheckTransaction(orderID string) (Status, error)
 	GetOrderByID(orderID string) (*entities.OrderModels, error)
 	UpdatePayment(orderID, orderStatus, paymentStatus string) error
+	CreateCart(newCart *entities.CartModels) (*entities.CartModels, error)
+	GetCartItem(userID, productID uint64) (*entities.CartModels, error)
+	UpdateCartItem(cartItem *entities.CartModels) error
+	GetCartByID(cartID uint64) (*entities.CartModels, error)
+	DeleteCartItem(cartItemID uint64) error
+	GetCartByUserID(userID uint64) ([]*entities.CartModels, error)
 }
 
 type OrderServiceInterface interface {
@@ -22,6 +28,10 @@ type OrderServiceInterface interface {
 	CreateOrder(userID uint64, request *CreateOrderRequest) (*CreateOrderResponse, error)
 	GetOrderByID(orderID string) (*entities.OrderModels, error)
 	CallBack(req map[string]interface{}) error
+	CreateCart(userID uint64, req *CreateCartRequest) (*entities.CartModels, error)
+	DeleteCartItems(cartID uint64) error
+	GetCartUser(userID uint64) ([]*entities.CartModels, error)
+	CreateOrderCart(userID uint64, request *CreateOrderCartRequest) (*CreateOrderResponse, error)
 }
 
 type OrderHandlerInterface interface {
@@ -29,4 +39,8 @@ type OrderHandlerInterface interface {
 	GetAllPayment(c *fiber.Ctx) error
 	CreateOrder(c *fiber.Ctx) error
 	Callback(c *fiber.Ctx) error
+	CreateCart(c *fiber.Ctx) error
+	DeleteCart(c *fiber.Ctx) error
+	GetCartUser(c *fiber.Ctx) error
+	CreateOrderCart(c *fiber.Ctx) error
 }
