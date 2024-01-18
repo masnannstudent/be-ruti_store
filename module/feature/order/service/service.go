@@ -31,7 +31,7 @@ func NewOrderService(
 	addressService address.AddressServiceInterface,
 	userService users.UserServiceInterface,
 	notificationService notification.NotificationServiceInterface,
-//cartService cart.ServiceCartInterface,
+	//cartService cart.ServiceCartInterface,
 
 ) domain.OrderServiceInterface {
 	return &OrderService{
@@ -158,7 +158,7 @@ func (s *OrderService) CreateOrder(userID uint64, request *domain.CreateOrderReq
 	}
 
 	if err := s.productService.ReduceStockWhenPurchasing(request.ProductID, request.Quantity); err != nil {
-		return nil, errors.New("gagal mengurangi stok")
+		return nil, errors.New("failed reduce stock")
 	}
 
 	notificationRequest := domain.CreateNotificationPaymentRequest{
@@ -217,13 +217,22 @@ func (s *OrderService) GetOrderByID(orderID string) (*entities.OrderModels, erro
 func (s *OrderService) ConfirmPayment(orderID string) error {
 	orders, err := s.repo.GetOrderByID(orderID)
 	if err != nil {
-		return errors.New("pesanan tidak ditemukan")
+		return errors.New("transaction data not found")
 	}
 
 	orders.OrderStatus = "Proses"
 	orders.PaymentStatus = "Konfirmasi"
 
 	if err := s.repo.UpdatePayment(orders.ID, orders.OrderStatus, orders.PaymentStatus); err != nil {
+		return err
+	}
+	notificationRequest := domain.CreateNotificationPaymentRequest{
+		OrderID:       orders.ID,
+		UserID:        orders.UserID,
+		PaymentStatus: "Konfirmasi",
+	}
+	_, err = s.SendNotificationPayment(notificationRequest)
+	if err != nil {
 		return err
 	}
 
@@ -233,7 +242,7 @@ func (s *OrderService) ConfirmPayment(orderID string) error {
 func (s *OrderService) CancelPayment(orderID string) error {
 	orders, err := s.repo.GetOrderByID(orderID)
 	if err != nil {
-		return errors.New("pesanan tidak ditemukan")
+		return errors.New("transaction data not found")
 	}
 
 	orders.OrderStatus = "Gagal"
@@ -247,6 +256,15 @@ func (s *OrderService) CancelPayment(orderID string) error {
 		if err := s.productService.IncreaseStock(orderDetail.ProductID, orderDetail.Quantity); err != nil {
 			return errors.New("failed to increase stock")
 		}
+	}
+	notificationRequest := domain.CreateNotificationPaymentRequest{
+		OrderID:       orders.ID,
+		UserID:        orders.UserID,
+		PaymentStatus: "Menunggu Konfirmasi",
+	}
+	_, err = s.SendNotificationPayment(notificationRequest)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -267,11 +285,11 @@ func (s *OrderService) SendNotificationPayment(request domain.CreateNotification
 
 	switch request.PaymentStatus {
 	case "Menunggu Konfirmasi":
-		notificationMsg = fmt.Sprintf("Alloo, %s! Pesananmu dengan ID %s udah berhasil dibuat, nih. Ditunggu yupp!!", user.Name, orders.IdOrder)
+		notificationMsg = fmt.Sprintf("Halo, %s! Pesanan dengan ID %s sudah berhasil dibuat. Harap ditunggu!", user.Name, orders.IdOrder)
 	case "Konfirmasi":
-		notificationMsg = fmt.Sprintf("Thengkyuu, %s! Pembayaran untuk pesananmu dengan ID %s udah kami terima, nih. Semoga harimu menyenangkan!", user.Name, orders.IdOrder)
+		notificationMsg = fmt.Sprintf("Terima kasih, %s! Pembayaran untuk pesanan dengan ID %s telah kami terima. Semoga harimu menyenangkan!", user.Name, orders.IdOrder)
 	case "Gagal":
-		notificationMsg = fmt.Sprintf("Maaf, %s. Pembayaran untuk pesanan dengan ID %s gagal, nih. Beritahu kami apabila kamu butuh bantuan yaa!!", user.Name, orders.IdOrder)
+		notificationMsg = fmt.Sprintf("Maaf, %s. Pembayaran untuk pesanan dengan ID %s gagal. Beritahu kami jika Anda membutuhkan bantuan!", user.Name, orders.IdOrder)
 	default:
 		return "", errors.New("Status pesanan tidak valid")
 	}
@@ -304,15 +322,15 @@ func (s *OrderService) SendNotificationOrder(request domain.CreateNotificationOr
 
 	switch request.OrderStatus {
 	case "Pengiriman":
-		notificationMsg = fmt.Sprintf("Alloo, %s! Pesanan dengan ID %s udah dalam proses pengiriman, nih. Mohon ditunggu yupp!", user.Name, orders.IdOrder)
+		notificationMsg = fmt.Sprintf("Halo, %s! Pesanan dengan ID %s sedang dalam proses pengiriman. Harap ditunggu!", user.Name, orders.IdOrder)
 	case "Selesai":
-		notificationMsg = fmt.Sprintf("Yeayy, %s! Pesananmu dengan ID %s udah sampai tujuan, nih. Semoga sukakk yupp!", user.Name, orders.IdOrder)
+		notificationMsg = fmt.Sprintf("Selamat, %s! Pesanan dengan ID %s sudah sampai tujuan. Semoga Anda puas!", user.Name, orders.IdOrder)
 	case "Menunggu Konfirmasi":
-		notificationMsg = fmt.Sprintf("Alloo, %s! Pesananmu dengan ID %s sedang menunggu konfirmasi, nih. Ditunggu yupp!", user.Name, orders.IdOrder)
+		notificationMsg = fmt.Sprintf("Halo, %s! Pesanan dengan ID %s sedang menunggu konfirmasi. Harap ditunggu!", user.Name, orders.IdOrder)
 	case "Proses":
-		notificationMsg = fmt.Sprintf("Alloo, %s! Pesananmu dengan ID %s sedang dalam proses, nih. Ditunggu yupp!", user.Name, orders.IdOrder)
+		notificationMsg = fmt.Sprintf("Halo, %s! Pesanan dengan ID %s sedang dalam proses. Harap ditunggu!", user.Name, orders.IdOrder)
 	case "Gagal":
-		notificationMsg = fmt.Sprintf("Sowwy, %s. Pesananmu dengan ID %s gagal. Coba lagi, yukk!", user.Name, orders.IdOrder)
+		notificationMsg = fmt.Sprintf("Maaf, %s. Pesanan dengan ID %s gagal. Silakan coba lagi.", user.Name, orders.IdOrder)
 	default:
 		return "", errors.New("Status pengiriman tidak valid")
 	}
