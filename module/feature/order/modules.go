@@ -69,4 +69,5 @@ func SetupOrderRoutes(app *fiber.App, jwt token.JWTInterface, userService user.U
 	api.Post("/cart/create", middleware.AuthMiddleware(jwt, userService), orderHand.CreateCart)
 	api.Delete("/cart/delete/:id", middleware.AuthMiddleware(jwt, userService), orderHand.DeleteCart)
 	api.Get("/cart/list", middleware.AuthMiddleware(jwt, userService), orderHand.GetCartUser)
+	api.Post("/create/cart", middleware.AuthMiddleware(jwt, userService), orderHand.CreateOrderCart)
 }

@@ -31,6 +31,7 @@ type OrderServiceInterface interface {
 	CreateCart(userID uint64, req *CreateCartRequest) (*entities.CartModels, error)
 	DeleteCartItems(cartID uint64) error
 	GetCartUser(userID uint64) ([]*entities.CartModels, error)
+	CreateOrderCart(userID uint64, request *CreateOrderCartRequest) (*CreateOrderResponse, error)
 }
 
 type OrderHandlerInterface interface {
@@ -41,4 +42,5 @@ type OrderHandlerInterface interface {
 	CreateCart(c *fiber.Ctx) error
 	DeleteCart(c *fiber.Ctx) error
 	GetCartUser(c *fiber.Ctx) error
+	CreateOrderCart(c *fiber.Ctx) error
 }
