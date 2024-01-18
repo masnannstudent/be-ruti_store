@@ -123,3 +123,18 @@ func (r *OrderRepository) UpdateCartItem(cartItem *entities.CartModels) error {
 	}
 	return nil
 }
+
+func (r *OrderRepository) DeleteCartItem(cartItemID uint64) error {
+	if err := r.db.Where("id = ?", cartItemID).Delete(&entities.CartModels{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *OrderRepository) GetCartByID(cartID uint64) (*entities.CartModels, error) {
+	var carts *entities.CartModels
+	if err := r.db.Where("id = ?", cartID).First(&carts).Error; err != nil {
+		return nil, err
+	}
+	return carts, nil
+}

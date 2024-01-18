@@ -31,7 +31,7 @@ func NewOrderService(
 	addressService address.AddressServiceInterface,
 	userService users.UserServiceInterface,
 	notificationService notification.NotificationServiceInterface,
-	//cartService cart.ServiceCartInterface,
+//cartService cart.ServiceCartInterface,
 
 ) domain.OrderServiceInterface {
 	return &OrderService{
@@ -384,4 +384,18 @@ func (s *OrderService) CreateCart(userID uint64, req *domain.CreateCartRequest) 
 	}
 	return result, nil
 
+}
+
+func (s *OrderService) DeleteCartItems(cartID uint64) error {
+	cart, err := s.repo.GetCartByID(cartID)
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.DeleteCartItem(cart.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

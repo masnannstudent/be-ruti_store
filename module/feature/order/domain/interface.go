@@ -17,6 +17,8 @@ type OrderRepositoryInterface interface {
 	CreateCart(newCart *entities.CartModels) (*entities.CartModels, error)
 	GetCartItem(userID, productID uint64) (*entities.CartModels, error)
 	UpdateCartItem(cartItem *entities.CartModels) error
+	GetCartByID(cartID uint64) (*entities.CartModels, error)
+	DeleteCartItem(cartItemID uint64) error
 }
 
 type OrderServiceInterface interface {
@@ -26,6 +28,7 @@ type OrderServiceInterface interface {
 	GetOrderByID(orderID string) (*entities.OrderModels, error)
 	CallBack(req map[string]interface{}) error
 	CreateCart(userID uint64, req *CreateCartRequest) (*entities.CartModels, error)
+	DeleteCartItems(cartID uint64) error
 }
 
 type OrderHandlerInterface interface {
@@ -34,4 +37,5 @@ type OrderHandlerInterface interface {
 	CreateOrder(c *fiber.Ctx) error
 	Callback(c *fiber.Ctx) error
 	CreateCart(c *fiber.Ctx) error
+	DeleteCart(c *fiber.Ctx) error
 }
