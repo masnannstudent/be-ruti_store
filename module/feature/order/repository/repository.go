@@ -100,3 +100,49 @@ func (r *OrderRepository) UpdatePayment(orderID, orderStatus, paymentStatus stri
 	}
 	return nil
 }
+
+func (r *OrderRepository) CreateCart(newCart *entities.CartModels) (*entities.CartModels, error) {
+	err := r.db.Create(newCart).Error
+	if err != nil {
+		return nil, err
+	}
+	return newCart, nil
+}
+
+func (r *OrderRepository) GetCartItem(userID, productID uint64) (*entities.CartModels, error) {
+	var cartItem *entities.CartModels
+	if err := r.db.Where("user_id = ? AND product_id = ?", userID, productID).First(&cartItem).Error; err != nil {
+		return nil, err
+	}
+	return cartItem, nil
+}
+
+func (r *OrderRepository) UpdateCartItem(cartItem *entities.CartModels) error {
+	if err := r.db.Save(&cartItem).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *OrderRepository) DeleteCartItem(cartItemID uint64) error {
+	if err := r.db.Where("id = ?", cartItemID).Delete(&entities.CartModels{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *OrderRepository) GetCartByID(cartID uint64) (*entities.CartModels, error) {
+	var carts *entities.CartModels
+	if err := r.db.Where("id = ?", cartID).First(&carts).Error; err != nil {
+		return nil, err
+	}
+	return carts, nil
+}
+
+func (r *OrderRepository) GetCartByUserID(userID uint64) ([]*entities.CartModels, error) {
+	var carts []*entities.CartModels
+	if err := r.db.Where("user_id = ?", userID).Find(&carts).Error; err != nil {
+		return nil, err
+	}
+	return carts, nil
+}
