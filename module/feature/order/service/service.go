@@ -348,3 +348,40 @@ func (s *OrderService) SendNotificationOrder(request domain.CreateNotificationOr
 
 	return notificationMsg, nil
 }
+
+func (s *OrderService) CreateCart(userID uint64, req *domain.CreateCartRequest) (*entities.CartModels, error) {
+
+	products, err := s.productService.GetProductByID(req.ProductID)
+	if err != nil {
+		return nil, errors.New("product not found")
+	}
+	user, err := s.userService.GetUserByID(userID)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	existingCartItem, err := s.repo.GetCartItem(user.ID, products.ID)
+	if err == nil && existingCartItem != nil {
+		existingCartItem.Quantity += req.Quantity
+
+		err := s.repo.UpdateCartItem(existingCartItem)
+		if err != nil {
+			return nil, errors.New("gagal mengubah jumlah produk di keranjang")
+		}
+
+		return existingCartItem, nil
+	}
+
+	newData := &entities.CartModels{
+		UserID:    user.ID,
+		ProductID: products.ID,
+		Quantity:  req.Quantity,
+	}
+
+	result, err := s.repo.CreateCart(newData)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+
+}

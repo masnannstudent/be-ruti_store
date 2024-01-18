@@ -34,3 +34,8 @@ type CreateNotificationPaymentRequest struct {
 	Title         string `json:"title"`
 	Message       string `json:"message"`
 }
+
+type CreateCartRequest struct {
+	ProductID uint64 `json:"product_id" validate:"required"`
+	Quantity  uint64 `json:"quantity" validate:"required,min=1"`
+}

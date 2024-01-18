@@ -249,3 +249,19 @@ type CreateOrderResponse struct {
 	RedirectURL     string `json:"redirect_url"`
 	TotalAmountPaid uint64 `json:"total_amount_paid"`
 }
+
+type CreateCartResponse struct {
+	ID        uint64 `json:"id"`
+	UserID    uint64 `json:"user_id"`
+	ProductID uint64 `json:"product_id"`
+	Quantity  uint64 `json:"quantity"`
+}
+
+func CreateCartFormatter(cart *entities.CartModels) *CreateCartResponse {
+	return &CreateCartResponse{
+		ID:        cart.ID,
+		UserID:    cart.UserID,
+		ProductID: cart.ProductID,
+		Quantity:  cart.Quantity,
+	}
+}
