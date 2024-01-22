@@ -200,6 +200,7 @@ func (r *ProductRepository) GetAllOrders() ([]*entities.OrderModels, error) {
 		Preload("OrderDetails.Product").
 		Where("deleted_at IS NULL").
 		Order("created_at DESC").
+		Limit(10).
 		Find(&orders).Error; err != nil {
 		return nil, err
 	}

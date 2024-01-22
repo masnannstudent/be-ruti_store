@@ -21,7 +21,6 @@ type OrderService struct {
 	addressService      address.AddressServiceInterface
 	userService         users.UserServiceInterface
 	notificationService notification.NotificationServiceInterface
-	//cartService    cart.ServiceCartInterface
 }
 
 func NewOrderService(
@@ -31,7 +30,6 @@ func NewOrderService(
 	addressService address.AddressServiceInterface,
 	userService users.UserServiceInterface,
 	notificationService notification.NotificationServiceInterface,
-	//cartService cart.ServiceCartInterface,
 
 ) domain.OrderServiceInterface {
 	return &OrderService{
@@ -41,7 +39,6 @@ func NewOrderService(
 		addressService:      addressService,
 		userService:         userService,
 		notificationService: notificationService,
-		//cartService:    cartService,
 	}
 }
 
