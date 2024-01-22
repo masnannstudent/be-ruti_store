@@ -32,4 +32,5 @@ func SetupRoutesHome(app *fiber.App, jwt token.JWTInterface, userService user.Us
 	api.Put("/carousel/update/:id", middleware.AuthMiddleware(jwt, userService), hand.UpdateCarousel)
 	api.Delete("/carousel/delete/:id", middleware.AuthMiddleware(jwt, userService), hand.DeleteCarousel)
 	api.Get("/dashboard", middleware.AuthMiddleware(jwt, userService), hand.GetDashboard)
+	api.Get("/latest-order", middleware.AuthMiddleware(jwt, userService), hand.GetAllOrders)
 }

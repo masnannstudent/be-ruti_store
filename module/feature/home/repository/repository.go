@@ -122,3 +122,31 @@ func (r *HomeRepository) GetTotalIncome() (uint64, error) {
 
 	return totalIncome, nil
 }
+
+func (r *HomeRepository) GetAllOrders(page, pageSize int) ([]*entities.OrderModels, error) {
+	var orders []*entities.OrderModels
+
+	offset := (page - 1) * pageSize
+
+	if err := r.db.
+		Preload("User").
+		Where("deleted_at IS NULL").
+		Order("created_at DESC").
+		Offset(offset).
+		Limit(pageSize).
+		Find(&orders).Error; err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}
+
+func (r *HomeRepository) GetTotalOrderItems() (int64, error) {
+	var totalItems int64
+
+	if err := r.db.Model(&entities.OrderModels{}).Count(&totalItems).Where("deleted_at IS NULL").Error; err != nil {
+		return 0, err
+	}
+
+	return totalItems, nil
+}
