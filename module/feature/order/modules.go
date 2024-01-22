@@ -22,6 +22,7 @@ import (
 	user "ruti-store/module/feature/user/domain"
 	userRepository "ruti-store/module/feature/user/repository"
 	userService "ruti-store/module/feature/user/service"
+	assistant "ruti-store/utils/assitant"
 	generator2 "ruti-store/utils/generator"
 	"ruti-store/utils/shipping"
 	"ruti-store/utils/token"
@@ -41,10 +42,12 @@ var (
 	ship             shipping.ShippingServiceInterface
 	notificationRepo notification.NotificationRepositoryInterface
 	notificationServ notification.NotificationServiceInterface
+	openAi           assistant.AssistantServiceInterface
 )
 
 func InitializeOrder(db *gorm.DB, snapClient snap.Client, coreClient coreapi.Client) {
-	productRepo = productRepository.NewProductRepository(db)
+	openAi = assistant.NewAssistantService()
+	productRepo = productRepository.NewProductRepository(db, openAi)
 	productServ = productService.NewProductService(productRepo)
 	uuidGenerator = generator2.NewGeneratorUUID(db)
 	ship = shipping.NewShippingService()
@@ -73,4 +76,5 @@ func SetupOrderRoutes(app *fiber.App, jwt token.JWTInterface, userService user.U
 	api.Post("/accept/:id", middleware.AuthMiddleware(jwt, userService), orderHand.AcceptOrder)
 	api.Put("/update-status", middleware.AuthMiddleware(jwt, userService), orderHand.UpdateOrderStatus)
 	api.Get("details/:id", middleware.AuthMiddleware(jwt, userService), orderHand.GetOrderByID)
+	api.Get("/user/list", middleware.AuthMiddleware(jwt, userService), orderHand.GetOrderUser)
 }
