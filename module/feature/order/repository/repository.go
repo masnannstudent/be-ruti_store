@@ -183,3 +183,19 @@ func (r *OrderRepository) UpdateOrderStatus(orderID, orderStatus string) error {
 
 	return nil
 }
+
+func (r *OrderRepository) GetAllOrdersByUserID(userID uint64) ([]*entities.OrderModels, error) {
+	var orders []*entities.OrderModels
+
+	if err := r.db.
+		Preload("OrderDetails").
+		Preload("OrderDetails.Product").
+		Preload("OrderDetails.Product.Photos").
+		Where("user_id = ? AND deleted_at IS NULL", userID).
+		Order("created_at DESC").
+		Find(&orders).Error; err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}
