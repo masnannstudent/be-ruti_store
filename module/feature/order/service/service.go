@@ -432,26 +432,22 @@ func (s *OrderService) CreateOrderCart(userID uint64, request *domain.CreateOrde
 	var orderDetails []entities.OrderDetailsModels
 	var totalQuantity, totalPrice, totalDiscount uint64
 
-	// Iterasi melalui setiap item keranjang
 	for _, cartItemRequest := range request.CartItems {
-		// Mendapatkan informasi item keranjang
+
 		cartItem, err := s.repo.GetCartByID(cartItemRequest.ID)
 		if err != nil {
 			return nil, errors.New("cart item not found")
 		}
 
-		// Mendapatkan informasi produk dari item keranjang
 		products, err := s.productService.GetProductByID(cartItem.ProductID)
 		if err != nil {
 			return nil, errors.New("product not found")
 		}
 
-		// Memeriksa ketersediaan stok
 		if products.Stock < cartItem.Quantity {
 			return nil, errors.New("insufficient stock for this order")
 		}
 
-		// Membuat detail pesanan
 		orderDetail := entities.OrderDetailsModels{
 			OrderID:       orderID,
 			ProductID:     products.ID,
@@ -460,15 +456,12 @@ func (s *OrderService) CreateOrderCart(userID uint64, request *domain.CreateOrde
 			TotalDiscount: products.Discount * cartItem.Quantity,
 		}
 
-		// Menambahkan total kuantitas, harga, dan diskon
 		totalQuantity += cartItem.Quantity
 		totalPrice += orderDetail.TotalPrice
 		totalDiscount += orderDetail.TotalDiscount
 
-		// Menambahkan detail pesanan ke slice
 		orderDetails = append(orderDetails, orderDetail)
 
-		// Mengurangi stok produk
 		if err := s.productService.ReduceStockWhenPurchasing(products.ID, cartItem.Quantity); err != nil {
 			return nil, errors.New("failed reduce stock")
 		}
@@ -517,6 +510,12 @@ func (s *OrderService) CreateOrderCart(userID uint64, request *domain.CreateOrde
 	_, err = s.SendNotificationPayment(notificationRequest)
 	if err != nil {
 		return nil, err
+	}
+
+	for _, cartItemRequest := range request.CartItems {
+		if err := s.repo.DeleteCartItem(cartItemRequest.ID); err != nil {
+			return nil, errors.New("failed to delete cart item")
+		}
 	}
 
 	response := &domain.CreateOrderResponse{
