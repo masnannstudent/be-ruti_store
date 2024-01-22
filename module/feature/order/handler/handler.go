@@ -242,3 +242,29 @@ func (h *OrderHandler) AcceptOrder(c *fiber.Ctx) error {
 	}
 	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Accept order successfully")
 }
+
+func (h *OrderHandler) UpdateOrderStatus(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+
+	req := new(domain.UpdateOrderStatus)
+	if err := c.BodyParser(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Failed to parse request body")
+	}
+
+	if err := validator.ValidateStruct(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	err := h.service.UpdateOrderStatus(req)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Update order successfully")
+}

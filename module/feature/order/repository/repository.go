@@ -156,3 +156,18 @@ func (r *OrderRepository) AcceptOrder(orderID, orderStatus string) error {
 	}
 	return nil
 }
+
+func (r *OrderRepository) UpdateOrderStatus(orderID, orderStatus string) error {
+	var orders *entities.OrderModels
+	if err := r.db.Where("id = ?", orderID).First(&orders).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Model(&orders).Updates(map[string]interface{}{
+		"order_status": orderStatus,
+	}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

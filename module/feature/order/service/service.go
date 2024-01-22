@@ -556,3 +556,31 @@ func (s *OrderService) AcceptOrder(orderID string) error {
 
 	return nil
 }
+
+func (s *OrderService) UpdateOrderStatus(req *domain.UpdateOrderStatus) error {
+	orders, err := s.repo.GetOrderByID(req.ID)
+	if err != nil {
+		return errors.New("order not found")
+	}
+
+	if err := s.repo.UpdateOrderStatus(orders.ID, req.OrderStatus); err != nil {
+		return err
+	}
+
+	user, err := s.userService.GetUserByID(orders.UserID)
+	if err != nil {
+		return errors.New("user not found")
+	}
+
+	notificationRequest := domain.CreateNotificationOrderRequest{
+		OrderID:     orders.ID,
+		UserID:      user.ID,
+		OrderStatus: req.OrderStatus,
+	}
+	_, err = s.SendNotificationOrder(notificationRequest)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
