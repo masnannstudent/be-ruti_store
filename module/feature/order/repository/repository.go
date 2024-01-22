@@ -141,7 +141,7 @@ func (r *OrderRepository) GetCartByID(cartID uint64) (*entities.CartModels, erro
 
 func (r *OrderRepository) GetCartByUserID(userID uint64) ([]*entities.CartModels, error) {
 	var carts []*entities.CartModels
-	if err := r.db.Where("user_id = ?", userID).Find(&carts).Error; err != nil {
+	if err := r.db.Preload("Product.Photos").Where("user_id = ?", userID).Find(&carts).Error; err != nil {
 		return nil, err
 	}
 	return carts, nil
