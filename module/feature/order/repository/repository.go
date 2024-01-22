@@ -83,11 +83,23 @@ func (r *OrderRepository) CreateOrder(newOrder *entities.OrderModels) (*entities
 }
 
 func (r *OrderRepository) GetOrderByID(orderID string) (*entities.OrderModels, error) {
-	var order *entities.OrderModels
-	if err := r.db.Where("id = ? AND deleted_at IS NULL", orderID).First(&order).Error; err != nil {
+	var order entities.OrderModels
+
+	err := r.db.
+		Preload("OrderDetails").
+		Preload("OrderDetails.Product").
+		Preload("OrderDetails.Product.Photos").
+		Preload("User").
+		Preload("Address").
+		Where("id = ? AND deleted_at IS NULL", orderID).
+		First(&order).
+		Error
+
+	if err != nil {
 		return nil, err
 	}
-	return order, nil
+
+	return &order, nil
 }
 
 func (r *OrderRepository) UpdatePayment(orderID, orderStatus, paymentStatus string) error {
@@ -141,8 +153,33 @@ func (r *OrderRepository) GetCartByID(cartID uint64) (*entities.CartModels, erro
 
 func (r *OrderRepository) GetCartByUserID(userID uint64) ([]*entities.CartModels, error) {
 	var carts []*entities.CartModels
-	if err := r.db.Where("user_id = ?", userID).Find(&carts).Error; err != nil {
+	if err := r.db.Preload("Product.Photos").Where("user_id = ?", userID).Find(&carts).Error; err != nil {
 		return nil, err
 	}
 	return carts, nil
+}
+
+func (r *OrderRepository) AcceptOrder(orderID, orderStatus string) error {
+	if err := r.db.Model(&entities.OrderModels{}).
+		Where("id = ?", orderID).
+		Update("order_status", orderStatus).
+		Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *OrderRepository) UpdateOrderStatus(orderID, orderStatus string) error {
+	var orders *entities.OrderModels
+	if err := r.db.Where("id = ?", orderID).First(&orders).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Model(&orders).Updates(map[string]interface{}{
+		"order_status": orderStatus,
+	}).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

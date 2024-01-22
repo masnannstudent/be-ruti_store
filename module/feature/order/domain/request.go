@@ -49,3 +49,8 @@ type CreateOrderCartRequest struct {
 type CartItemRequest struct {
 	ID uint64 `json:"id" validate:"required"`
 }
+
+type UpdateOrderStatus struct {
+	ID          string `json:"id" validate:"required"`
+	OrderStatus string `json:"order_status" validate:"required"`
+}
