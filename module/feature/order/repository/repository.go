@@ -146,3 +146,13 @@ func (r *OrderRepository) GetCartByUserID(userID uint64) ([]*entities.CartModels
 	}
 	return carts, nil
 }
+
+func (r *OrderRepository) AcceptOrder(orderID, orderStatus string) error {
+	if err := r.db.Model(&entities.OrderModels{}).
+		Where("id = ?", orderID).
+		Update("order_status", orderStatus).
+		Error; err != nil {
+		return err
+	}
+	return nil
+}

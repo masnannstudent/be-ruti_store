@@ -220,3 +220,25 @@ func (h *OrderHandler) CreateOrderCart(c *fiber.Ctx) error {
 	}
 	return response.SuccessBuildResponse(c, fiber.StatusOK, "Order created successfully", result)
 }
+
+func (h *OrderHandler) AcceptOrder(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "customer" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only customer users can access this resource.")
+	}
+
+	orderID := c.Params("id")
+	if orderID == "" {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	err := h.service.AcceptOrder(orderID)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Accept order successfully")
+}

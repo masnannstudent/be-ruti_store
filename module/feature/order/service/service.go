@@ -527,3 +527,32 @@ func (s *OrderService) CreateOrderCart(userID uint64, request *domain.CreateOrde
 	}
 	return response, nil
 }
+
+func (s *OrderService) AcceptOrder(orderID string) error {
+	orders, err := s.repo.GetOrderByID(orderID)
+	if err != nil {
+		return errors.New("order not found")
+	}
+
+	user, err := s.userService.GetUserByID(orders.UserID)
+	if err != nil {
+		return errors.New("user not found")
+	}
+
+	orders.OrderStatus = "Selesai"
+
+	if err := s.repo.AcceptOrder(orders.ID, orders.OrderStatus); err != nil {
+		return err
+	}
+	notificationRequest := domain.CreateNotificationOrderRequest{
+		OrderID:     orders.ID,
+		UserID:      user.ID,
+		OrderStatus: "Selesai",
+	}
+	_, err = s.SendNotificationOrder(notificationRequest)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
