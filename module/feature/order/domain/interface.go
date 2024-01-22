@@ -22,6 +22,7 @@ type OrderRepositoryInterface interface {
 	GetCartByUserID(userID uint64) ([]*entities.CartModels, error)
 	AcceptOrder(orderID, orderStatus string) error
 	UpdateOrderStatus(orderID, orderStatus string) error
+	GetAllOrdersByUserID(userID uint64) ([]*entities.OrderModels, error)
 }
 
 type OrderServiceInterface interface {
@@ -36,6 +37,7 @@ type OrderServiceInterface interface {
 	CreateOrderCart(userID uint64, request *CreateOrderCartRequest) (*CreateOrderResponse, error)
 	AcceptOrder(orderID string) error
 	UpdateOrderStatus(req *UpdateOrderStatus) error
+	GetAllOrdersByUserID(userID uint64) ([]*entities.OrderModels, error)
 }
 
 type OrderHandlerInterface interface {
@@ -50,4 +52,5 @@ type OrderHandlerInterface interface {
 	AcceptOrder(c *fiber.Ctx) error
 	UpdateOrderStatus(c *fiber.Ctx) error
 	GetOrderByID(c *fiber.Ctx) error
+	GetOrderUser(c *fiber.Ctx) error
 }

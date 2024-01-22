@@ -587,3 +587,15 @@ func (s *OrderService) UpdateOrderStatus(req *domain.UpdateOrderStatus) error {
 
 	return nil
 }
+
+func (s *OrderService) GetAllOrdersByUserID(userID uint64) ([]*entities.OrderModels, error) {
+	user, err := s.userService.GetUserByID(userID)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+	result, err := s.repo.GetAllOrdersByUserID(user.ID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
