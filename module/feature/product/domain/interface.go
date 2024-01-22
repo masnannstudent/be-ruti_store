@@ -19,6 +19,8 @@ type ProductRepositoryInterface interface {
 	UpdateProductPhoto(productID uint64, newPhotoURL string) error
 	ReduceStockWhenPurchasing(productID, quantity uint64) error
 	IncreaseStock(productID, quantity uint64) error
+	GenerateRecommendationProduct() ([]string, error)
+	FindAllProductRecommendation(productsFromAI []string) ([]*entities.ProductModels, error)
 }
 
 type ProductServiceInterface interface {
@@ -35,6 +37,8 @@ type ProductServiceInterface interface {
 	UpdatePhotoProduct(productID uint64, photo string) error
 	ReduceStockWhenPurchasing(productID, quantity uint64) error
 	IncreaseStock(productID, quantity uint64) error
+	GetProductRecommendation() ([]string, error)
+	GetAllProductsRecommendation() ([]*entities.ProductModels, error)
 }
 
 type ProductHandlerInterface interface {
@@ -46,4 +50,6 @@ type ProductHandlerInterface interface {
 	GetAllProductsReview(c *fiber.Ctx) error
 	AddPhotoProduct(c *fiber.Ctx) error
 	UpdatePhotoProduct(c *fiber.Ctx) error
+	GetProductRecommendation(c *fiber.Ctx) error
+	GetAllProductsRecommendation(c *fiber.Ctx) error
 }

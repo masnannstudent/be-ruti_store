@@ -12,6 +12,7 @@ import (
 	"ruti-store/module/feature/review/repository"
 	"ruti-store/module/feature/review/service"
 	user "ruti-store/module/feature/user/domain"
+	assistant "ruti-store/utils/assitant"
 	"ruti-store/utils/token"
 )
 
@@ -21,11 +22,13 @@ var (
 	reviewHand  domain.ReviewHandlerInterface
 	productServ products.ProductServiceInterface
 	productRepo products.ProductRepositoryInterface
+	openAi      assistant.AssistantServiceInterface
 )
 
 func InitializeReviews(db *gorm.DB) {
+	openAi = assistant.NewAssistantService()
 	reviewRepo = repository.NewReviewRepository(db)
-	productRepo = productsRepo.NewProductRepository(db)
+	productRepo = productsRepo.NewProductRepository(db, openAi)
 	productServ = productsService.NewProductService(productRepo)
 	reviewServ = service.NewReviewService(reviewRepo, productServ)
 	reviewHand = handler.NewReviewHandler(reviewServ)

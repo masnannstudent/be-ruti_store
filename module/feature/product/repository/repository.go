@@ -1,18 +1,25 @@
 package repository
 
 import (
+	"context"
+	"fmt"
+	"github.com/sashabaranov/go-openai"
 	"gorm.io/gorm"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/product/domain"
+	assistant "ruti-store/utils/assitant"
+	"strings"
 )
 
 type ProductRepository struct {
-	db *gorm.DB
+	db     *gorm.DB
+	openAi assistant.AssistantServiceInterface
 }
 
-func NewProductRepository(db *gorm.DB) domain.ProductRepositoryInterface {
+func NewProductRepository(db *gorm.DB, openAi assistant.AssistantServiceInterface) domain.ProductRepositoryInterface {
 	return &ProductRepository{
-		db: db,
+		db:     db,
+		openAi: openAi,
 	}
 }
 
@@ -183,4 +190,107 @@ func (r *ProductRepository) IncreaseStock(productID, quantity uint64) error {
 		return err
 	}
 	return nil
+}
+
+func (r *ProductRepository) GetAllOrders() ([]*entities.OrderModels, error) {
+	var orders []*entities.OrderModels
+
+	if err := r.db.
+		Preload("OrderDetails").
+		Preload("OrderDetails.Product").
+		Where("deleted_at IS NULL").
+		Order("created_at DESC").
+		Find(&orders).Error; err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}
+
+func (r *ProductRepository) GenerateRecommendationProduct() ([]string, error) {
+	ctx := context.Background()
+
+	orders, err := r.GetAllOrders()
+	if err != nil {
+		return nil, err
+	}
+
+	var recommendedProducts []string
+	chat := []openai.ChatCompletionMessage{
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "Anda adalah seorang analis untuk pembelian pengguna.",
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "Berdasarkan pembelian sebelumnya oleh pengguna dan tren terkini di Indonesia, berikan 3 produk yang relevan. Hanya nama produk, tanpa deskripsi atau yang lainnya.",
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "Contoh jawaban\n1. Tas\n2. Baju\n3. Celana",
+		},
+	}
+
+	orderContent := "Daftar produk yang dibeli oleh pengguna: \n"
+	for _, order := range orders {
+		for _, product := range order.OrderDetails {
+			orderContent += fmt.Sprintf("- %s\n", product.Product.Name)
+		}
+	}
+
+	chat = append(chat, openai.ChatCompletionMessage{
+		Role:    openai.ChatMessageRoleUser,
+		Content: orderContent,
+	})
+
+	resp, err := r.openAi.GetAnswerFromAi(chat, ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, choice := range resp.Choices {
+		if choice.Message.Role == "assistant" {
+			lines := strings.Split(choice.Message.Content, "\n")
+			for _, line := range lines {
+				if strings.TrimSpace(line) != "" {
+					product := strings.SplitN(line, ". ", 2)
+					if len(product) > 1 {
+						recommendedProducts = append(recommendedProducts, strings.TrimSpace(product[1]))
+					}
+				}
+			}
+		}
+	}
+
+	return recommendedProducts, nil
+}
+
+func (r *ProductRepository) FindAllProductRecommendation(productsFromAI []string) ([]*entities.ProductModels, error) {
+	var matchingProducts []*entities.ProductModels
+
+	if len(productsFromAI) == 0 {
+		return nil, nil
+	}
+
+	var relevantConditions []string
+	var relevantValues []interface{}
+	for _, productDesc := range productsFromAI {
+		relevantConditions = append(relevantConditions, "name LIKE ?")
+		relevantValues = append(relevantValues, "%"+productDesc+"%")
+	}
+
+	relevantQuery := r.db.Table("product").
+		Where(strings.Join(relevantConditions, " OR "), relevantValues...)
+
+	fullQuery := r.db.
+		Raw("(?)", relevantQuery).
+		Preload("Photos").
+		Preload("Categories").
+		Limit(3).
+		Find(&matchingProducts)
+
+	if fullQuery.Error != nil {
+		return nil, fullQuery.Error
+	}
+
+	return matchingProducts, nil
 }
