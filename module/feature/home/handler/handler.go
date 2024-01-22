@@ -204,3 +204,37 @@ func (h *HomeHandler) GetDashboard(c *fiber.Ctx) error {
 		domain.FormatDashboardResponse(totalIncome, totalProduct, totalUser))
 
 }
+
+func (h *HomeHandler) GetAllOrders(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+
+	currentPage, err := strconv.Atoi(c.Query("page"))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page number")
+	}
+
+	pageSize, err := strconv.Atoi(c.Query("page_size"))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
+	}
+
+	result, totalItems, err := h.service.GetAllOrders(currentPage, pageSize)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	currentPage, totalPages, nextPage, prevPage, err := h.service.GetOrdersPage(currentPage, pageSize)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
+	}
+
+	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
+		domain.ResponseArrayOrderSummary(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
+}

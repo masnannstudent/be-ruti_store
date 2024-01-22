@@ -52,3 +52,28 @@ func FormatDashboardResponse(totalIncome uint64, totalProduct, totalUser int64) 
 	}
 	return result
 }
+
+type OrderSummaryResponse struct {
+	IDOrder         string    `json:"id_order"`
+	Name            string    `json:"name"`
+	Date            time.Time `json:"date"`
+	TotalAmountPaid uint64    `json:"total_amount_paid"`
+	OrderStatus     string    `json:"order_status"`
+}
+
+func ResponseArrayOrderSummary(data []*entities.OrderModels) []*OrderSummaryResponse {
+	res := make([]*OrderSummaryResponse, 0)
+
+	for _, order := range data {
+		orderRes := &OrderSummaryResponse{
+			IDOrder:         order.IdOrder,
+			Name:            order.User.Name,
+			Date:            order.CreatedAt,
+			TotalAmountPaid: order.TotalAmountPaid,
+			OrderStatus:     order.OrderStatus,
+		}
+		res = append(res, orderRes)
+	}
+
+	return res
+}
