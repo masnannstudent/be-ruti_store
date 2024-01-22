@@ -210,8 +210,11 @@ func (s *OrderService) CallBack(req map[string]interface{}) error {
 }
 
 func (s *OrderService) GetOrderByID(orderID string) (*entities.OrderModels, error) {
-	//TODO implement me
-	panic("implement me")
+	result, err := s.repo.GetOrderByID(orderID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (s *OrderService) ConfirmPayment(orderID string) error {
@@ -526,4 +529,61 @@ func (s *OrderService) CreateOrderCart(userID uint64, request *domain.CreateOrde
 		TotalAmountPaid: createdOrder.TotalAmountPaid,
 	}
 	return response, nil
+}
+
+func (s *OrderService) AcceptOrder(orderID string) error {
+	orders, err := s.repo.GetOrderByID(orderID)
+	if err != nil {
+		return errors.New("order not found")
+	}
+
+	user, err := s.userService.GetUserByID(orders.UserID)
+	if err != nil {
+		return errors.New("user not found")
+	}
+
+	orders.OrderStatus = "Selesai"
+
+	if err := s.repo.AcceptOrder(orders.ID, orders.OrderStatus); err != nil {
+		return err
+	}
+	notificationRequest := domain.CreateNotificationOrderRequest{
+		OrderID:     orders.ID,
+		UserID:      user.ID,
+		OrderStatus: "Selesai",
+	}
+	_, err = s.SendNotificationOrder(notificationRequest)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *OrderService) UpdateOrderStatus(req *domain.UpdateOrderStatus) error {
+	orders, err := s.repo.GetOrderByID(req.ID)
+	if err != nil {
+		return errors.New("order not found")
+	}
+
+	if err := s.repo.UpdateOrderStatus(orders.ID, req.OrderStatus); err != nil {
+		return err
+	}
+
+	user, err := s.userService.GetUserByID(orders.UserID)
+	if err != nil {
+		return errors.New("user not found")
+	}
+
+	notificationRequest := domain.CreateNotificationOrderRequest{
+		OrderID:     orders.ID,
+		UserID:      user.ID,
+		OrderStatus: req.OrderStatus,
+	}
+	_, err = s.SendNotificationOrder(notificationRequest)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

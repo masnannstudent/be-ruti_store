@@ -32,7 +32,6 @@ type OrderDetailResponse struct {
 	ProductID        uint64          `json:"product_id"`
 	Quantity         uint64          `json:"quantity"`
 	TotalGramPlastic uint64          `json:"total_gram_plastic"`
-	TotalExp         uint64          `json:"total_exp"`
 	TotalPrice       uint64          `json:"total_price"`
 	TotalDiscount    uint64          `json:"total_discount"`
 	Product          ProductResponse `json:"product,omitempty"`
@@ -49,8 +48,6 @@ type ProductResponse struct {
 	Name          string                 `json:"name"`
 	Price         uint64                 `json:"price"`
 	Discount      uint64                 `json:"discount"`
-	GramPlastic   uint64                 `json:"gram_plastic"`
-	ProductExp    uint64                 `json:"product_exp"`
 	ProductPhotos []ProductPhotoResponse `json:"product_photos"`
 }
 
@@ -59,6 +56,8 @@ type AddressResponse struct {
 	UserID       uint64 `json:"user_id"`
 	AcceptedName string `json:"accepted_name" `
 	Phone        string `json:"phone"`
+	ProvinceName string `json:"province_name"`
+	CityName     string `json:"city_name"`
 	Address      string `json:"address"`
 	IsPrimary    bool   `json:"is_primary"`
 }
@@ -93,6 +92,8 @@ func FormatOrderDetail(order *entities.OrderModels) OrderResponse {
 			UserID:       order.Address.UserID,
 			AcceptedName: order.Address.AcceptedName,
 			Phone:        order.Address.Phone,
+			ProvinceName: order.Address.ProvinceName,
+			CityName:     order.Address.CityName,
 			Address:      order.Address.Address,
 			IsPrimary:    order.Address.IsPrimary,
 		},
@@ -122,7 +123,6 @@ func FormatOrderDetail(order *entities.OrderModels) OrderResponse {
 			ProductID:        detail.ProductID,
 			Quantity:         detail.Quantity,
 			TotalGramPlastic: detail.TotalGramPlastic,
-			TotalExp:         detail.TotalExp,
 			TotalPrice:       detail.TotalPrice,
 			TotalDiscount:    detail.TotalDiscount,
 			Product: ProductResponse{
@@ -267,23 +267,46 @@ func CreateCartFormatter(cart *entities.CartModels) *CreateCartResponse {
 }
 
 type CartResponse struct {
-	ID        uint64 `json:"id"`
-	UserID    uint64 `json:"user_id"`
-	ProductID uint64 `json:"product_id"`
-	Quantity  uint64 `json:"quantity"`
+	ID        uint64           `json:"id"`
+	UserID    uint64           `json:"user_id"`
+	ProductID uint64           `json:"product_id"`
+	Quantity  uint64           `json:"quantity"`
+	Product   *ProductResponse `json:"product"`
+}
+
+func buildProductResponse(product *entities.ProductModels) *ProductResponse {
+	return &ProductResponse{
+		ID:            product.ID,
+		Name:          product.Name,
+		Price:         product.Price,
+		Discount:      product.Discount,
+		ProductPhotos: buildProductPhotoResponses(product.Photos),
+	}
+}
+
+func buildProductPhotoResponses(photos []entities.ProductPhotoModels) []ProductPhotoResponse {
+	photoResponses := make([]ProductPhotoResponse, len(photos))
+	for i, photo := range photos {
+		photoResponses[i] = ProductPhotoResponse{
+			ID:        photo.ID,
+			ProductID: photo.ProductID,
+			URL:       photo.URL,
+		}
+	}
+	return photoResponses
 }
 
 func ResponseArrayCart(data []*entities.CartModels) []*CartResponse {
-	res := make([]*CartResponse, 0)
+	res := make([]*CartResponse, len(data))
 
-	for _, cart := range data {
-		cartRes := &CartResponse{
+	for i, cart := range data {
+		res[i] = &CartResponse{
 			ID:        cart.ID,
 			UserID:    cart.UserID,
 			ProductID: cart.ProductID,
 			Quantity:  cart.Quantity,
+			Product:   buildProductResponse(&cart.Product),
 		}
-		res = append(res, cartRes)
 	}
 
 	return res
