@@ -23,6 +23,7 @@ type OrderRepositoryInterface interface {
 	AcceptOrder(orderID, orderStatus string) error
 	UpdateOrderStatus(orderID, orderStatus string) error
 	GetAllOrdersByUserID(userID uint64) ([]*entities.OrderModels, error)
+	RemoveProductFromCart(userID, productID uint64) error
 }
 
 type OrderServiceInterface interface {

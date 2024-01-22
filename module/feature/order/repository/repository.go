@@ -199,3 +199,10 @@ func (r *OrderRepository) GetAllOrdersByUserID(userID uint64) ([]*entities.Order
 
 	return orders, nil
 }
+
+func (r *OrderRepository) RemoveProductFromCart(userID, productID uint64) error {
+	if err := r.db.Where("user_id = ? AND product_id = ?", userID, productID).Delete(&entities.CartModels{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
