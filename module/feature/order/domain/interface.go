@@ -49,4 +49,5 @@ type OrderHandlerInterface interface {
 	CreateOrderCart(c *fiber.Ctx) error
 	AcceptOrder(c *fiber.Ctx) error
 	UpdateOrderStatus(c *fiber.Ctx) error
+	GetOrderByID(c *fiber.Ctx) error
 }

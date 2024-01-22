@@ -72,4 +72,5 @@ func SetupOrderRoutes(app *fiber.App, jwt token.JWTInterface, userService user.U
 	api.Post("/create/cart", middleware.AuthMiddleware(jwt, userService), orderHand.CreateOrderCart)
 	api.Post("/accept/:id", middleware.AuthMiddleware(jwt, userService), orderHand.AcceptOrder)
 	api.Put("/update-status", middleware.AuthMiddleware(jwt, userService), orderHand.UpdateOrderStatus)
+	api.Get("details/:id", middleware.AuthMiddleware(jwt, userService), orderHand.GetOrderByID)
 }

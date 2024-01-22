@@ -83,11 +83,23 @@ func (r *OrderRepository) CreateOrder(newOrder *entities.OrderModels) (*entities
 }
 
 func (r *OrderRepository) GetOrderByID(orderID string) (*entities.OrderModels, error) {
-	var order *entities.OrderModels
-	if err := r.db.Where("id = ? AND deleted_at IS NULL", orderID).First(&order).Error; err != nil {
+	var order entities.OrderModels
+
+	err := r.db.
+		Preload("OrderDetails").
+		Preload("OrderDetails.Product").
+		Preload("OrderDetails.Product.Photos").
+		Preload("User").
+		Preload("Address").
+		Where("id = ? AND deleted_at IS NULL", orderID).
+		First(&order).
+		Error
+
+	if err != nil {
 		return nil, err
 	}
-	return order, nil
+
+	return &order, nil
 }
 
 func (r *OrderRepository) UpdatePayment(orderID, orderStatus, paymentStatus string) error {

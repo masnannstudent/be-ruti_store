@@ -268,3 +268,16 @@ func (h *OrderHandler) UpdateOrderStatus(c *fiber.Ctx) error {
 	}
 	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Update order successfully")
 }
+
+func (h *OrderHandler) GetOrderByID(c *fiber.Ctx) error {
+	orderID := c.Params("id")
+	if orderID == "" {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	result, err := h.service.GetOrderByID(orderID)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+	return response.SuccessBuildResponse(c, fiber.StatusOK, "Update order successfully", domain.FormatOrderDetail(result))
+}

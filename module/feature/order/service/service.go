@@ -210,8 +210,11 @@ func (s *OrderService) CallBack(req map[string]interface{}) error {
 }
 
 func (s *OrderService) GetOrderByID(orderID string) (*entities.OrderModels, error) {
-	//TODO implement me
-	panic("implement me")
+	result, err := s.repo.GetOrderByID(orderID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (s *OrderService) ConfirmPayment(orderID string) error {

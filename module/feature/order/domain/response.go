@@ -56,6 +56,8 @@ type AddressResponse struct {
 	UserID       uint64 `json:"user_id"`
 	AcceptedName string `json:"accepted_name" `
 	Phone        string `json:"phone"`
+	ProvinceName string `json:"province_name"`
+	CityName     string `json:"city_name"`
 	Address      string `json:"address"`
 	IsPrimary    bool   `json:"is_primary"`
 }
@@ -90,6 +92,8 @@ func FormatOrderDetail(order *entities.OrderModels) OrderResponse {
 			UserID:       order.Address.UserID,
 			AcceptedName: order.Address.AcceptedName,
 			Phone:        order.Address.Phone,
+			ProvinceName: order.Address.ProvinceName,
+			CityName:     order.Address.CityName,
 			Address:      order.Address.Address,
 			IsPrimary:    order.Address.IsPrimary,
 		},
