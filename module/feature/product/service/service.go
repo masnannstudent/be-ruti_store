@@ -209,3 +209,24 @@ func (s *ProductService) IncreaseStock(productID, quantity uint64) error {
 	}
 	return nil
 }
+
+func (s *ProductService) GetProductRecommendation() ([]string, error) {
+	result, err := s.repo.GenerateRecommendationProduct()
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (s *ProductService) GetAllProductsRecommendation() ([]*entities.ProductModels, error) {
+	recommendation, err := s.repo.GenerateRecommendationProduct()
+	if err != nil {
+		return nil, errors.New("err while get recommendation")
+	}
+	result, err := s.repo.FindAllProductRecommendation(recommendation)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}

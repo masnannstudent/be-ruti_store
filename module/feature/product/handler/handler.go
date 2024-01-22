@@ -259,3 +259,20 @@ func (h *ProductHandler) UpdatePhotoProduct(c *fiber.Ctx) error {
 
 	return response.SuccessBuildWithoutResponse(c, fiber.StatusCreated, "Success update photo product")
 }
+
+func (h *ProductHandler) GetProductRecommendation(c *fiber.Ctx) error {
+	result, err := h.service.GetProductRecommendation()
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+	return response.SuccessBuildResponse(c, fiber.StatusOK, "success get recommendation", result)
+}
+
+func (h *ProductHandler) GetAllProductsRecommendation(c *fiber.Ctx) error {
+	result, err := h.service.GetAllProductsRecommendation()
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	return response.SuccessBuildResponse(c, fiber.StatusOK, "Success get pagination product recommendation", domain.ResponseArrayProducts(result))
+}
