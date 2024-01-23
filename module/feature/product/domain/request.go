@@ -6,6 +6,7 @@ type CreateProductRequest struct {
 	Description string   `json:"description" validate:"required"`
 	Stock       uint64   `json:"stock" validate:"required"`
 	Discount    uint64   `json:"discount"`
+	Size        string   `json:"size" validate:"required"`
 	Weight      uint64   `json:"weight" validate:"required"`
 	CategoryID  []uint64 `json:"category_id" validate:"required"`
 }
@@ -17,6 +18,7 @@ type UpdateProductRequest struct {
 	Description string   `json:"description" `
 	Stock       uint64   `json:"stock"`
 	Discount    uint64   `json:"discount"`
+	Size        string   `json:"size"`
 	Weight      uint64   `json:"weight"`
 	CategoryID  []uint64 `json:"category_id"`
 }
