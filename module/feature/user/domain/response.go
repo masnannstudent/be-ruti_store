@@ -12,6 +12,8 @@ type UserResponse struct {
 	Phone        string    `json:"phone"`
 	Name         string    `json:"name"`
 	PhotoProfile string    `json:"photo_profile"`
+	Gender       string    `json:"gender"`
+	DateOfBirth  time.Time `json:"date_of_birth"`
 	Role         string    `json:"role"`
 	CreatedAt    time.Time `json:"created_at"`
 }
@@ -24,6 +26,9 @@ func UserFormatter(user *entities.UserModels) *UserResponse {
 		Phone:        user.Phone,
 		Name:         user.Name,
 		PhotoProfile: user.PhotoProfile,
+		Gender:       user.Gender,
+		DateOfBirth:  user.DateOfBirth,
+		CreatedAt:    user.CreatedAt,
 	}
 	return result
 }
@@ -53,6 +58,8 @@ func ResponseArrayUser(data []*entities.UserModels) []*UserResponse {
 			Phone:        userItem.Phone,
 			Name:         userItem.Name,
 			PhotoProfile: userItem.PhotoProfile,
+			Gender:       userItem.Gender,
+			DateOfBirth:  userItem.DateOfBirth,
 			Role:         userItem.Role,
 			CreatedAt:    userItem.CreatedAt,
 		}

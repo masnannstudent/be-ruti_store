@@ -108,6 +108,7 @@ func (s *OrderService) CreateOrder(userID uint64, request *domain.CreateOrderReq
 	orderDetail := entities.OrderDetailsModels{
 		OrderID:       orderID,
 		ProductID:     request.ProductID,
+		Size:          request.Size,
 		Quantity:      request.Quantity,
 		TotalPrice:    request.Quantity * (products.Price - products.Discount),
 		TotalDiscount: products.Discount * request.Quantity,
@@ -375,6 +376,7 @@ func (s *OrderService) CreateCart(userID uint64, req *domain.CreateCartRequest) 
 	newData := &entities.CartModels{
 		UserID:    user.ID,
 		ProductID: products.ID,
+		Size:      req.Size,
 		Quantity:  req.Quantity,
 	}
 
@@ -451,6 +453,7 @@ func (s *OrderService) CreateOrderCart(userID uint64, request *domain.CreateOrde
 		orderDetail := entities.OrderDetailsModels{
 			OrderID:       orderID,
 			ProductID:     products.ID,
+			Size:          cartItem.Size,
 			Quantity:      cartItem.Quantity,
 			TotalPrice:    cartItem.Quantity * (products.Price - products.Discount),
 			TotalDiscount: products.Discount * cartItem.Quantity,
