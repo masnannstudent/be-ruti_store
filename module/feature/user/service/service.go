@@ -35,6 +35,8 @@ func (s *UserService) EditProfile(userID uint64, req *domain.EditProfileRequest)
 		Phone:        req.Phone,
 		Name:         req.Name,
 		PhotoProfile: req.PhotoProfile,
+		Gender:       req.Gender,
+		DateOfBirth:  req.DateOfBirth,
 		UpdatedAt:    time.Now(),
 	}
 	err = s.repo.EditProfile(user.ID, newData)

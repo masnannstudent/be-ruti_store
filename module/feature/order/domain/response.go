@@ -19,7 +19,6 @@ type OrderResponse struct {
 	TotalAmountPaid    uint64                `json:"total_amount_paid"`
 	OrderStatus        string                `json:"order_status"`
 	PaymentStatus      string                `json:"payment_status"`
-	PaymentMethod      string                `json:"payment_method"`
 	CreatedAt          time.Time             `json:"created_at"`
 	Address            AddressResponse       `json:"address"`
 	User               UserResponse          `json:"user"`
@@ -30,6 +29,7 @@ type OrderDetailResponse struct {
 	ID               uint64          `json:"id"`
 	OrderID          string          `json:"order_id"`
 	ProductID        uint64          `json:"product_id"`
+	Size             string          `json:"size"`
 	Quantity         uint64          `json:"quantity"`
 	TotalGramPlastic uint64          `json:"total_gram_plastic"`
 	TotalPrice       uint64          `json:"total_price"`
@@ -85,7 +85,6 @@ func FormatOrderDetail(order *entities.OrderModels) OrderResponse {
 		TotalAmountPaid:    order.TotalAmountPaid,
 		OrderStatus:        order.OrderStatus,
 		PaymentStatus:      order.PaymentStatus,
-		PaymentMethod:      order.PaymentMethod,
 		CreatedAt:          order.CreatedAt,
 		Address: AddressResponse{
 			ID:           order.Address.ID,
@@ -121,6 +120,7 @@ func FormatOrderDetail(order *entities.OrderModels) OrderResponse {
 			ID:               detail.ID,
 			OrderID:          detail.OrderID,
 			ProductID:        detail.ProductID,
+			Size:             detail.Size,
 			Quantity:         detail.Quantity,
 			TotalGramPlastic: detail.TotalGramPlastic,
 			TotalPrice:       detail.TotalPrice,
@@ -254,6 +254,7 @@ type CreateCartResponse struct {
 	ID        uint64 `json:"id"`
 	UserID    uint64 `json:"user_id"`
 	ProductID uint64 `json:"product_id"`
+	Size      string `json:"size"`
 	Quantity  uint64 `json:"quantity"`
 }
 
@@ -262,6 +263,7 @@ func CreateCartFormatter(cart *entities.CartModels) *CreateCartResponse {
 		ID:        cart.ID,
 		UserID:    cart.UserID,
 		ProductID: cart.ProductID,
+		Size:      cart.Size,
 		Quantity:  cart.Quantity,
 	}
 }
@@ -270,6 +272,7 @@ type CartResponse struct {
 	ID        uint64           `json:"id"`
 	UserID    uint64           `json:"user_id"`
 	ProductID uint64           `json:"product_id"`
+	Size      string           `json:"size"`
 	Quantity  uint64           `json:"quantity"`
 	Product   *ProductResponse `json:"product"`
 }
@@ -304,6 +307,7 @@ func ResponseArrayCart(data []*entities.CartModels) []*CartResponse {
 			ID:        cart.ID,
 			UserID:    cart.UserID,
 			ProductID: cart.ProductID,
+			Size:      cart.Size,
 			Quantity:  cart.Quantity,
 			Product:   buildProductResponse(&cart.Product),
 		}
@@ -321,9 +325,6 @@ type GetAllOrderUserResponse struct {
 	TotalAmountPaid uint64                `json:"total_amount_paid"`
 	OrderStatus     string                `json:"order_status"`
 	PaymentStatus   string                `json:"payment_status"`
-	PaymentMethod   string                `json:"payment_method"`
-	ExtraInfo       string                `json:"extra_info"`
-	StatusOrderDate time.Time             `json:"status_order_date"`
 	CreatedAt       time.Time             `json:"created_at"`
 	OrderDetails    []OrderDetailResponse `json:"order_details"`
 }
@@ -337,7 +338,6 @@ func FormatGetAllOrderUser(order *entities.OrderModels) *GetAllOrderUserResponse
 		TotalAmountPaid: order.TotalAmountPaid,
 		OrderStatus:     order.OrderStatus,
 		PaymentStatus:   order.PaymentStatus,
-		PaymentMethod:   order.PaymentMethod,
 		CreatedAt:       order.CreatedAt,
 	}
 
@@ -356,6 +356,7 @@ func FormatGetAllOrderUser(order *entities.OrderModels) *GetAllOrderUserResponse
 			ID:               detail.ID,
 			OrderID:          detail.OrderID,
 			ProductID:        detail.ProductID,
+			Size:             detail.Size,
 			Quantity:         detail.Quantity,
 			TotalGramPlastic: detail.TotalGramPlastic,
 			TotalPrice:       detail.TotalPrice,

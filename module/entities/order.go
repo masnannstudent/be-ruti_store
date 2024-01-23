@@ -29,6 +29,7 @@ type OrderDetailsModels struct {
 	ID               uint64        `gorm:"column:id;primaryKey" json:"id"`
 	OrderID          string        `gorm:"column:order_id;type:VARCHAR(255)" json:"order_id"`
 	ProductID        uint64        `gorm:"column:product_id" json:"product_id"`
+	Size             string        `gorm:"column:size;type:VARCHAR(255)" json:"size"`
 	Quantity         uint64        `gorm:"column:quantity" json:"quantity"`
 	TotalDiscount    uint64        `gorm:"column:total_discount" json:"total_discount"`
 	TotalGramPlastic uint64        `gorm:"column:total_gram_plastic" json:"total_gram_plastic"`
