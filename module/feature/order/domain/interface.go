@@ -39,6 +39,7 @@ type OrderServiceInterface interface {
 	AcceptOrder(orderID string) error
 	UpdateOrderStatus(req *UpdateOrderStatus) error
 	GetAllOrdersByUserID(userID uint64) ([]*entities.OrderModels, error)
+	GetCartById(cartID uint64) (*entities.CartModels, error)
 }
 
 type OrderHandlerInterface interface {
@@ -54,4 +55,5 @@ type OrderHandlerInterface interface {
 	UpdateOrderStatus(c *fiber.Ctx) error
 	GetOrderByID(c *fiber.Ctx) error
 	GetOrderUser(c *fiber.Ctx) error
+	GetCartByID(c *fiber.Ctx) error
 }

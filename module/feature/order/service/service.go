@@ -598,3 +598,11 @@ func (s *OrderService) GetAllOrdersByUserID(userID uint64) ([]*entities.OrderMod
 	}
 	return result, nil
 }
+
+func (s *OrderService) GetCartById(cartID uint64) (*entities.CartModels, error) {
+	result, err := s.repo.GetCartByID(cartID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}

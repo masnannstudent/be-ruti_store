@@ -21,11 +21,12 @@ type ProductRepositoryInterface interface {
 	IncreaseStock(productID, quantity uint64) error
 	GenerateRecommendationProduct() ([]string, error)
 	FindAllProductRecommendation(productsFromAI []string) ([]*entities.ProductModels, error)
+	SearchAndPaginateProducts(name string, page, pageSize int) ([]*entities.ProductModels, int64, error)
 }
 
 type ProductServiceInterface interface {
 	GetAllProducts(page, pageSize int) ([]*entities.ProductModels, int64, error)
-	GetProductsPage(currentPage, pageSize int) (int, int, int, int, error)
+	GetProductsPage(currentPage, pageSize, totalItems int) (int, int, int, error)
 	GetProductByID(productID uint64) (*entities.ProductModels, error)
 	CreateProduct(req *CreateProductRequest) (*entities.ProductModels, error)
 	UpdateProduct(productID uint64, req *UpdateProductRequest) error
@@ -39,6 +40,7 @@ type ProductServiceInterface interface {
 	IncreaseStock(productID, quantity uint64) error
 	GetProductRecommendation() ([]string, error)
 	GetAllProductsRecommendation() ([]*entities.ProductModels, error)
+	SearchAndPaginateProducts(name string, page, pageSize int) ([]*entities.ProductModels, int64, error)
 }
 
 type ProductHandlerInterface interface {
