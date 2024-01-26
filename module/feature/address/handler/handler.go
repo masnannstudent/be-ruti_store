@@ -63,12 +63,12 @@ func (h *AddressHandler) GetAddressByID(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only customer users can access this resource.")
 	}
 	id := c.Params("id")
-	productID, err := strconv.ParseUint(id, 10, 64)
+	addressID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
 	}
 
-	result, err := h.service.GetAddressByID(productID)
+	result, err := h.service.GetAddressByID(addressID)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve product: "+err.Error())
 	}
@@ -99,7 +99,7 @@ func (h *AddressHandler) CreateAddress(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
-	return response.SuccessBuildResponse(c, fiber.StatusCreated, "Success create carousels", domain.AddressFormatter(result))
+	return response.SuccessBuildResponse(c, fiber.StatusCreated, "Success create address", domain.AddressFormatter(result))
 }
 
 func (h *AddressHandler) GetProvince(c *fiber.Ctx) error {
@@ -127,4 +127,37 @@ func (h *AddressHandler) GetCity(c *fiber.Ctx) error {
 	}
 	return response.SuccessBuildResponse(c, fiber.StatusOK, "Success get city", result)
 
+}
+
+func (h *AddressHandler) UpdateAddress(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "customer" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only customer users can access this resource.")
+	}
+
+	id := c.Params("id")
+	addressID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	req := new(domain.UpdateAddressRequest)
+	if err := c.BodyParser(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Failed to parse request body")
+	}
+
+	if err := validator.ValidateStruct(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	_, err = h.service.UpdateAddress(addressID, req)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusCreated, "Success update address")
 }

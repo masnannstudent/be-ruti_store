@@ -110,3 +110,41 @@ func (s *AddressService) GetCity(province string) (map[string]interface{}, error
 	}
 	return result, nil
 }
+
+func (s *AddressService) UpdateAddress(addressID uint64, req *domain.UpdateAddressRequest) (*entities.AddressModels, error) {
+	address, err := s.repo.GetAddressByID(addressID)
+	if err != nil {
+		return nil, errors.New("address not found")
+	}
+	if req.IsPrimary {
+		currentPrimaryAddress, err := s.repo.GetPrimaryAddressByUserID(address.UserID)
+		if err != nil {
+			return nil, errors.New("failed to get primary address")
+		}
+		if currentPrimaryAddress != nil && currentPrimaryAddress.ID != address.ID {
+			err = s.repo.UpdateIsPrimary(currentPrimaryAddress.ID, false)
+			if err != nil {
+				return nil, errors.New("failed to update previous primary address")
+			}
+		}
+	}
+
+	newData := &entities.AddressModels{
+		AcceptedName: req.AcceptedName,
+		Phone:        req.Phone,
+		ProvinceID:   req.ProvinceID,
+		ProvinceName: req.ProvinceName,
+		CityID:       req.CityID,
+		CityName:     req.CityName,
+		Address:      req.Address,
+		IsPrimary:    req.IsPrimary,
+		CreatedAt:    time.Now(),
+	}
+
+	updatedAddress, err := s.repo.UpdateAddress(address.ID, newData)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedAddress, nil
+}

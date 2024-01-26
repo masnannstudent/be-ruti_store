@@ -92,3 +92,16 @@ func (r *AddressRepository) GetCity(province string) (map[string]interface{}, er
 	}
 	return result, nil
 }
+
+func (r *AddressRepository) UpdateAddress(addressID uint64, updatedAddress *entities.AddressModels) (*entities.AddressModels, error) {
+	var addresses *entities.AddressModels
+	if err := r.db.Where("id = ? AND deleted_at IS NULL", addressID).First(&addresses).Error; err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Model(addresses).Updates(updatedAddress).Error; err != nil {
+		return nil, err
+	}
+
+	return addresses, nil
+}

@@ -34,4 +34,5 @@ func SetupRoutesAddress(app *fiber.App, jwt token.JWTInterface, userService user
 	api.Post("/create", middleware.AuthMiddleware(jwt, userService), hand.CreateAddress)
 	api.Get("/get-province", middleware.AuthMiddleware(jwt, userService), hand.GetProvince)
 	api.Get("/get-city", middleware.AuthMiddleware(jwt, userService), hand.GetCity)
+	api.Put("/update/:id", middleware.AuthMiddleware(jwt, userService), hand.UpdateAddress)
 }

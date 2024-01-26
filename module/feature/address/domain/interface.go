@@ -14,6 +14,7 @@ type AddressRepositoryInterface interface {
 	UpdateIsPrimary(addressID uint64, isPrimary bool) error
 	GetProvince() (map[string]interface{}, error)
 	GetCity(province string) (map[string]interface{}, error)
+	UpdateAddress(addressID uint64, updatedAddress *entities.AddressModels) (*entities.AddressModels, error)
 }
 
 type AddressServiceInterface interface {
@@ -23,6 +24,7 @@ type AddressServiceInterface interface {
 	CreateAddress(userID uint64, req *CreateAddressRequest) (*entities.AddressModels, error)
 	GetProvince() (map[string]interface{}, error)
 	GetCity(province string) (map[string]interface{}, error)
+	UpdateAddress(addressID uint64, req *UpdateAddressRequest) (*entities.AddressModels, error)
 }
 
 type AddressHandlerInterface interface {
@@ -31,4 +33,5 @@ type AddressHandlerInterface interface {
 	CreateAddress(c *fiber.Ctx) error
 	GetProvince(c *fiber.Ctx) error
 	GetCity(c *fiber.Ctx) error
+	UpdateAddress(c *fiber.Ctx) error
 }
