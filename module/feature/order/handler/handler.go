@@ -40,9 +40,21 @@ func (h *OrderHandler) GetAllOrders(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
 	}
 
-	result, totalItems, err := h.service.GetAllOrders(currentPage, pageSize)
-	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	searchQuery := c.Query("search")
+
+	var result []*entities.OrderModels
+	var totalItems int64
+
+	if searchQuery != "" {
+		result, totalItems, err = h.service.SearchAndPaginateOrder(currentPage, pageSize, searchQuery)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+		}
+	} else {
+		result, totalItems, err = h.service.GetAllOrders(currentPage, pageSize)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+		}
 	}
 
 	totalPages, nextPage, prevPage, err := h.service.GetOrdersPage(currentPage, pageSize, int(totalItems))
@@ -74,9 +86,21 @@ func (h *OrderHandler) GetAllPayment(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
 	}
 
-	result, totalItems, err := h.service.GetAllOrders(currentPage, pageSize)
-	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	searchQuery := c.Query("search")
+
+	var result []*entities.OrderModels
+	var totalItems int64
+
+	if searchQuery != "" {
+		result, totalItems, err = h.service.SearchAndPaginateOrder(currentPage, pageSize, searchQuery)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+		}
+	} else {
+		result, totalItems, err = h.service.GetAllOrders(currentPage, pageSize)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+		}
 	}
 
 	totalPages, nextPage, prevPage, err := h.service.GetOrdersPage(currentPage, pageSize, int(totalItems))

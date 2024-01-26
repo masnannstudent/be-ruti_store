@@ -235,3 +235,23 @@ func (r *OrderRepository) GetAllOrdersUserWithFilter(userID uint64, orderStatus 
 
 	return orders, totalItems, nil
 }
+
+func (r *OrderRepository) GetAllOrdersSearch(page, perPage int, name string) ([]*entities.OrderModels, int64, error) {
+	var orders []*entities.OrderModels
+	var totalItems int64
+
+	offset := (page - 1) * perPage
+
+	if err := r.db.Model(&entities.OrderModels{}).
+		Preload("User").
+		Joins("JOIN users ON users.id = orders.user_id").
+		Where("users.name LIKE ?", "%"+name+"%").
+		Where("orders.deleted_at IS NULL").
+		Count(&totalItems).
+		Offset(offset).Limit(perPage).Find(&orders).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return orders, totalItems, nil
+}
+

@@ -25,6 +25,7 @@ type OrderRepositoryInterface interface {
 	GetAllOrdersByUserID(userID uint64, page, pageSize int) ([]*entities.OrderModels, int64, error)
 	RemoveProductFromCart(userID, productID uint64) error
 	GetAllOrdersUserWithFilter(userID uint64, orderStatus string, page, pageSize int) ([]*entities.OrderModels, int64, error)
+	GetAllOrdersSearch(page, perPage int, name string) ([]*entities.OrderModels, int64, error)
 }
 
 type OrderServiceInterface interface {
@@ -42,6 +43,7 @@ type OrderServiceInterface interface {
 	GetAllOrdersByUserID(userID uint64, page, pageSize int) ([]*entities.OrderModels, int64, error)
 	GetCartById(cartID uint64) (*entities.CartModels, error)
 	GetAllOrdersWithFilter(userID uint64, orderStatus string, page, pageSize int) ([]*entities.OrderModels, int64, error)
+	SearchAndPaginateOrder(page, pageSize int, name string) ([]*entities.OrderModels, int64, error)
 }
 
 type OrderHandlerInterface interface {

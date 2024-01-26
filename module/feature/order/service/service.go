@@ -617,3 +617,11 @@ func (s *OrderService) GetAllOrdersWithFilter(userID uint64, orderStatus string,
 
 	return result, totalItems, nil
 }
+
+func (s *OrderService) SearchAndPaginateOrder(page, pageSize int, name string) ([]*entities.OrderModels, int64, error) {
+	result, totalItems, err := s.repo.GetAllOrdersSearch(page, pageSize, name)
+	if err != nil {
+		return nil, 0, err
+	}
+	return result, totalItems, nil
+}
