@@ -15,6 +15,7 @@ type AddressRepositoryInterface interface {
 	GetProvince() (map[string]interface{}, error)
 	GetCity(province string) (map[string]interface{}, error)
 	UpdateAddress(addressID uint64, updatedAddress *entities.AddressModels) (*entities.AddressModels, error)
+	DeleteAddress(addressID uint64) error
 }
 
 type AddressServiceInterface interface {
@@ -25,6 +26,7 @@ type AddressServiceInterface interface {
 	GetProvince() (map[string]interface{}, error)
 	GetCity(province string) (map[string]interface{}, error)
 	UpdateAddress(addressID uint64, req *UpdateAddressRequest) (*entities.AddressModels, error)
+	DeleteAddress(addressID, userID uint64) error
 }
 
 type AddressHandlerInterface interface {
@@ -34,4 +36,5 @@ type AddressHandlerInterface interface {
 	GetProvince(c *fiber.Ctx) error
 	GetCity(c *fiber.Ctx) error
 	UpdateAddress(c *fiber.Ctx) error
+	DeleteAddress(c *fiber.Ctx) error
 }

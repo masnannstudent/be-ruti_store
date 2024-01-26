@@ -5,6 +5,7 @@ import (
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/address/domain"
 	"ruti-store/utils/shipping"
+	"time"
 )
 
 type AddressRepository struct {
@@ -104,4 +105,17 @@ func (r *AddressRepository) UpdateAddress(addressID uint64, updatedAddress *enti
 	}
 
 	return addresses, nil
+}
+
+func (r *AddressRepository) DeleteAddress(addressID uint64) error {
+	addresses := &entities.AddressModels{}
+	if err := r.db.First(&addresses, addressID).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Model(&addresses).Update("deleted_at", time.Now()).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

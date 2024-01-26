@@ -148,3 +148,25 @@ func (s *AddressService) UpdateAddress(addressID uint64, req *domain.UpdateAddre
 
 	return updatedAddress, nil
 }
+
+func (s *AddressService) DeleteAddress(addressID, userID uint64) error {
+	address, err := s.repo.GetAddressByID(addressID)
+	if err != nil {
+		return errors.New("address not found")
+	}
+
+	primaryAddress, err := s.repo.GetPrimaryAddressByUserID(userID)
+	if err != nil {
+		return errors.New("failed to get primary address")
+	}
+
+	if address.ID == primaryAddress.ID {
+		return errors.New("primary address cannot be deleted")
+	}
+
+	if err := s.repo.DeleteAddress(address.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
