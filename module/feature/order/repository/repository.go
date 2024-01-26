@@ -184,20 +184,27 @@ func (r *OrderRepository) UpdateOrderStatus(orderID, orderStatus string) error {
 	return nil
 }
 
-func (r *OrderRepository) GetAllOrdersByUserID(userID uint64) ([]*entities.OrderModels, error) {
+func (r *OrderRepository) GetAllOrdersByUserID(userID uint64, page, pageSize int) ([]*entities.OrderModels, int64, error) {
 	var orders []*entities.OrderModels
+	var totalItems int64
+
+	offset := (page - 1) * pageSize
 
 	if err := r.db.
 		Preload("OrderDetails").
 		Preload("OrderDetails.Product").
 		Preload("OrderDetails.Product.Photos").
+		Model(&entities.OrderModels{}).
 		Where("user_id = ? AND deleted_at IS NULL", userID).
 		Order("created_at DESC").
+		Offset(offset).
+		Limit(pageSize).
+		Count(&totalItems).
 		Find(&orders).Error; err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return orders, nil
+	return orders, totalItems, nil
 }
 
 func (r *OrderRepository) RemoveProductFromCart(userID, productID uint64) error {
@@ -206,3 +213,45 @@ func (r *OrderRepository) RemoveProductFromCart(userID, productID uint64) error 
 	}
 	return nil
 }
+
+func (r *OrderRepository) GetAllOrdersUserWithFilter(userID uint64, orderStatus string, page, pageSize int) ([]*entities.OrderModels, int64, error) {
+	var orders []*entities.OrderModels
+	var totalItems int64
+
+	offset := (page - 1) * pageSize
+
+	if err := r.db.
+		Preload("OrderDetails").
+		Preload("OrderDetails.Product").
+		Preload("OrderDetails.Product.Photos").
+		Model(&entities.OrderModels{}).
+		Where("user_id = ? AND order_status = ? AND deleted_at IS NULL", userID, orderStatus).
+		Offset(offset).
+		Limit(pageSize).
+		Count(&totalItems).
+		Find(&orders).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return orders, totalItems, nil
+}
+
+func (r *OrderRepository) GetAllOrdersSearch(page, perPage int, name string) ([]*entities.OrderModels, int64, error) {
+	var orders []*entities.OrderModels
+	var totalItems int64
+
+	offset := (page - 1) * perPage
+
+	if err := r.db.Model(&entities.OrderModels{}).
+		Preload("User").
+		Joins("JOIN users ON users.id = orders.user_id").
+		Where("users.name LIKE ?", "%"+name+"%").
+		Where("orders.deleted_at IS NULL").
+		Count(&totalItems).
+		Offset(offset).Limit(perPage).Find(&orders).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return orders, totalItems, nil
+}
+
