@@ -298,3 +298,25 @@ func (h *OrderHandler) GetOrderUser(c *fiber.Ctx) error {
 	}
 	return response.SuccessBuildResponse(c, fiber.StatusOK, "Success get all order user", domain.FormatterGetAllOrderUser(result))
 }
+
+func (h *OrderHandler) GetCartByID(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "customer" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only customer users can access this resource.")
+	}
+	id := c.Params("id")
+	cartID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	result, err := h.service.GetCartById(cartID)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+	return response.SuccessBuildResponse(c, fiber.StatusOK, "Success get cart by id", domain.CartFormatter(result))
+}

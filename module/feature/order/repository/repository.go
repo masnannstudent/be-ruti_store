@@ -145,7 +145,7 @@ func (r *OrderRepository) DeleteCartItem(cartItemID uint64) error {
 
 func (r *OrderRepository) GetCartByID(cartID uint64) (*entities.CartModels, error) {
 	var carts *entities.CartModels
-	if err := r.db.Where("id = ?", cartID).First(&carts).Error; err != nil {
+	if err := r.db.Preload("Product.Photos").Where("id = ?", cartID).First(&carts).Error; err != nil {
 		return nil, err
 	}
 	return carts, nil

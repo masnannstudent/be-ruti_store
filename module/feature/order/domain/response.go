@@ -298,6 +298,16 @@ func buildProductPhotoResponses(photos []entities.ProductPhotoModels) []ProductP
 	}
 	return photoResponses
 }
+func CartFormatter(cart *entities.CartModels) *CartResponse {
+	return &CartResponse{
+		ID:        cart.ID,
+		UserID:    cart.UserID,
+		ProductID: cart.ProductID,
+		Size:      cart.Size,
+		Quantity:  cart.Quantity,
+		Product:   buildProductResponse(&cart.Product),
+	}
+}
 
 func ResponseArrayCart(data []*entities.CartModels) []*CartResponse {
 	res := make([]*CartResponse, len(data))
