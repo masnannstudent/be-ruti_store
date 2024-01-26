@@ -295,3 +295,25 @@ func (r *ProductRepository) FindAllProductRecommendation(productsFromAI []string
 
 	return matchingProducts, nil
 }
+
+func (r *ProductRepository) SearchAndPaginateProducts(name string, page, pageSize int) ([]*entities.ProductModels, int64, error) {
+	var products []*entities.ProductModels
+	var totalItems int64
+
+	if err := r.db.Where("deleted_at IS NULL").
+		Where("name LIKE ?", "%"+name+"%").
+		Model(&entities.ProductModels{}).Count(&totalItems).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * pageSize
+
+	if err := r.db.Where("deleted_at IS NULL").
+		Where("name LIKE ?", "%"+name+"%").
+		Order("created_at DESC").
+		Offset(offset).Limit(pageSize).Preload("Photos").Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return products, totalItems, nil
+}

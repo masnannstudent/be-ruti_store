@@ -32,12 +32,7 @@ func (s *ProductService) GetAllProducts(page, pageSize int) ([]*entities.Product
 	return result, totalItems, nil
 }
 
-func (s *ProductService) GetProductsPage(currentPage, pageSize int) (int, int, int, int, error) {
-	totalItems, err := s.repo.GetTotalItems()
-	if err != nil {
-		return 0, 0, 0, 0, err
-	}
-
+func (s *ProductService) GetProductsPage(currentPage, pageSize, totalItems int) (int, int, int, error) {
 	totalPages := int(math.Ceil(float64(totalItems) / float64(pageSize)))
 	nextPage := currentPage + 1
 	prevPage := currentPage - 1
@@ -50,7 +45,7 @@ func (s *ProductService) GetProductsPage(currentPage, pageSize int) (int, int, i
 		prevPage = 0
 	}
 
-	return currentPage, totalPages, nextPage, prevPage, nil
+	return totalPages, nextPage, prevPage, nil
 }
 
 func (s *ProductService) GetProductByID(productID uint64) (*entities.ProductModels, error) {
@@ -231,4 +226,12 @@ func (s *ProductService) GetAllProductsRecommendation() ([]*entities.ProductMode
 	}
 
 	return result, nil
+}
+
+func (s *ProductService) SearchAndPaginateProducts(name string, page, pageSize int) ([]*entities.ProductModels, int64, error) {
+	result, totalItems, err := s.repo.SearchAndPaginateProducts(name, page, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+	return result, totalItems, nil
 }
