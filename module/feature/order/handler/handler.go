@@ -40,12 +40,24 @@ func (h *OrderHandler) GetAllOrders(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
 	}
 
-	result, totalItems, err := h.service.GetAllOrders(currentPage, pageSize)
-	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	searchQuery := c.Query("search")
+
+	var result []*entities.OrderModels
+	var totalItems int64
+
+	if searchQuery != "" {
+		result, totalItems, err = h.service.SearchAndPaginateOrder(currentPage, pageSize, searchQuery)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+		}
+	} else {
+		result, totalItems, err = h.service.GetAllOrders(currentPage, pageSize)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+		}
 	}
 
-	currentPage, totalPages, nextPage, prevPage, err := h.service.GetOrdersPage(currentPage, pageSize)
+	totalPages, nextPage, prevPage, err := h.service.GetOrdersPage(currentPage, pageSize, int(totalItems))
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
 	}
@@ -74,12 +86,24 @@ func (h *OrderHandler) GetAllPayment(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
 	}
 
-	result, totalItems, err := h.service.GetAllOrders(currentPage, pageSize)
-	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	searchQuery := c.Query("search")
+
+	var result []*entities.OrderModels
+	var totalItems int64
+
+	if searchQuery != "" {
+		result, totalItems, err = h.service.SearchAndPaginateOrder(currentPage, pageSize, searchQuery)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+		}
+	} else {
+		result, totalItems, err = h.service.GetAllOrders(currentPage, pageSize)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+		}
 	}
 
-	currentPage, totalPages, nextPage, prevPage, err := h.service.GetOrdersPage(currentPage, pageSize)
+	totalPages, nextPage, prevPage, err := h.service.GetOrdersPage(currentPage, pageSize, int(totalItems))
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
 	}
@@ -292,11 +316,39 @@ func (h *OrderHandler) GetOrderUser(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only customer users can access this resource.")
 	}
 
-	result, err := h.service.GetAllOrdersByUserID(currentUser.ID)
+	currentPage, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page number")
 	}
-	return response.SuccessBuildResponse(c, fiber.StatusOK, "Success get all order user", domain.FormatterGetAllOrderUser(result))
+
+	pageSize, err := strconv.Atoi(c.Query("page_size"))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
+	}
+
+	filterQuery := c.Query("filter")
+	var result []*entities.OrderModels
+	var totalItems int64
+
+	if filterQuery != "" {
+		result, totalItems, err = h.service.GetAllOrdersWithFilter(currentUser.ID, filterQuery, currentPage, pageSize)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get products: "+err.Error())
+		}
+	} else {
+		result, totalItems, err = h.service.GetAllOrdersByUserID(currentUser.ID, currentPage, pageSize)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get products: "+err.Error())
+		}
+	}
+
+	totalPages, nextPage, prevPage, err := h.service.GetOrdersPage(currentPage, pageSize, int(totalItems))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
+	}
+
+	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
+		domain.ResponseArrayOrderUser(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
 }
 
 func (h *OrderHandler) GetCartByID(c *fiber.Ctx) error {
