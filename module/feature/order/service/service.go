@@ -56,12 +56,7 @@ func (s *OrderService) GetAllOrders(page, pageSize int) ([]*entities.OrderModels
 	return result, totalItems, nil
 }
 
-func (s *OrderService) GetOrdersPage(currentPage, pageSize int) (int, int, int, int, error) {
-	totalItems, err := s.repo.GetTotalItems()
-	if err != nil {
-		return 0, 0, 0, 0, err
-	}
-
+func (s *OrderService) GetOrdersPage(currentPage, pageSize, totalItems int) (int, int, int, error) {
 	totalPages := int(math.Ceil(float64(totalItems) / float64(pageSize)))
 	nextPage := currentPage + 1
 	prevPage := currentPage - 1
@@ -74,7 +69,7 @@ func (s *OrderService) GetOrdersPage(currentPage, pageSize int) (int, int, int, 
 		prevPage = 0
 	}
 
-	return currentPage, totalPages, nextPage, prevPage, nil
+	return totalPages, nextPage, prevPage, nil
 }
 
 func (s *OrderService) CreateOrder(userID uint64, request *domain.CreateOrderRequest) (*domain.CreateOrderResponse, error) {
@@ -587,16 +582,18 @@ func (s *OrderService) UpdateOrderStatus(req *domain.UpdateOrderStatus) error {
 	return nil
 }
 
-func (s *OrderService) GetAllOrdersByUserID(userID uint64) ([]*entities.OrderModels, error) {
+func (s *OrderService) GetAllOrdersByUserID(userID uint64, page, pageSize int) ([]*entities.OrderModels, int64, error) {
 	user, err := s.userService.GetUserByID(userID)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, 0, errors.New("user not found")
 	}
-	result, err := s.repo.GetAllOrdersByUserID(user.ID)
+
+	result, totalItems, err := s.repo.GetAllOrdersByUserID(user.ID, page, pageSize)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return result, nil
+
+	return result, totalItems, nil
 }
 
 func (s *OrderService) GetCartById(cartID uint64) (*entities.CartModels, error) {
@@ -605,4 +602,18 @@ func (s *OrderService) GetCartById(cartID uint64) (*entities.CartModels, error) 
 		return nil, err
 	}
 	return result, nil
+}
+
+func (s *OrderService) GetAllOrdersWithFilter(userID uint64, orderStatus string, page, pageSize int) ([]*entities.OrderModels, int64, error) {
+	user, err := s.userService.GetUserByID(userID)
+	if err != nil {
+		return nil, 0, errors.New("user not found")
+	}
+
+	result, totalItems, err := s.repo.GetAllOrdersUserWithFilter(user.ID, orderStatus, page, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return result, totalItems, nil
 }

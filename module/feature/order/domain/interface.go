@@ -22,13 +22,14 @@ type OrderRepositoryInterface interface {
 	GetCartByUserID(userID uint64) ([]*entities.CartModels, error)
 	AcceptOrder(orderID, orderStatus string) error
 	UpdateOrderStatus(orderID, orderStatus string) error
-	GetAllOrdersByUserID(userID uint64) ([]*entities.OrderModels, error)
+	GetAllOrdersByUserID(userID uint64, page, pageSize int) ([]*entities.OrderModels, int64, error)
 	RemoveProductFromCart(userID, productID uint64) error
+	GetAllOrdersUserWithFilter(userID uint64, orderStatus string, page, pageSize int) ([]*entities.OrderModels, int64, error)
 }
 
 type OrderServiceInterface interface {
 	GetAllOrders(page, pageSize int) ([]*entities.OrderModels, int64, error)
-	GetOrdersPage(currentPage, pageSize int) (int, int, int, int, error)
+	GetOrdersPage(currentPage, pageSize, totalItems int) (int, int, int, error)
 	CreateOrder(userID uint64, request *CreateOrderRequest) (*CreateOrderResponse, error)
 	GetOrderByID(orderID string) (*entities.OrderModels, error)
 	CallBack(req map[string]interface{}) error
@@ -38,8 +39,9 @@ type OrderServiceInterface interface {
 	CreateOrderCart(userID uint64, request *CreateOrderCartRequest) (*CreateOrderResponse, error)
 	AcceptOrder(orderID string) error
 	UpdateOrderStatus(req *UpdateOrderStatus) error
-	GetAllOrdersByUserID(userID uint64) ([]*entities.OrderModels, error)
+	GetAllOrdersByUserID(userID uint64, page, pageSize int) ([]*entities.OrderModels, int64, error)
 	GetCartById(cartID uint64) (*entities.CartModels, error)
+	GetAllOrdersWithFilter(userID uint64, orderStatus string, page, pageSize int) ([]*entities.OrderModels, int64, error)
 }
 
 type OrderHandlerInterface interface {

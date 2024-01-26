@@ -405,3 +405,60 @@ func FormatterGetAllOrderUser(orders []*entities.OrderModels) []*GetAllOrderUser
 
 	return orderFormatters
 }
+
+func ResponseArrayOrderUser(data []*entities.OrderModels) []*GetAllOrderUserResponse {
+	res := make([]*GetAllOrderUserResponse, 0)
+
+	for _, order := range data {
+		orderRes := &GetAllOrderUserResponse{
+			ID:              order.ID,
+			IdOrder:         order.IdOrder,
+			UserID:          order.UserID,
+			Note:            order.Note,
+			TotalAmountPaid: order.TotalAmountPaid,
+			OrderStatus:     order.OrderStatus,
+			PaymentStatus:   order.PaymentStatus,
+			CreatedAt:       order.CreatedAt,
+			OrderDetails:    getOrderDetailResponses(order.OrderDetails),
+		}
+		res = append(res, orderRes)
+	}
+
+	return res
+}
+
+func getOrderDetailResponses(data []entities.OrderDetailsModels) []OrderDetailResponse {
+	res := make([]OrderDetailResponse, 0)
+
+	for _, detail := range data {
+		productPhotos := buildProductPhotoResponses(detail.Product.Photos)
+
+		orderDetail := OrderDetailResponse{
+			ID:               detail.ID,
+			OrderID:          detail.OrderID,
+			ProductID:        detail.ProductID,
+			Size:             detail.Size,
+			Quantity:         detail.Quantity,
+			TotalGramPlastic: detail.TotalGramPlastic,
+			TotalPrice:       detail.TotalPrice,
+			TotalDiscount:    detail.TotalDiscount,
+			Product: ProductResponse{
+				ID:            detail.Product.ID,
+				Name:          detail.Product.Name,
+				Price:         detail.Product.Price,
+				Discount:      detail.Product.Discount,
+				ProductPhotos: productPhotos,
+			},
+		}
+		if len(detail.Product.Photos) > 0 {
+			productPhoto := ProductPhotoResponse{
+				ID:  detail.Product.Photos[0].ID,
+				URL: detail.Product.Photos[0].URL,
+			}
+			orderDetail.Product.ProductPhotos = []ProductPhotoResponse{productPhoto}
+		}
+		res = append(res, orderDetail)
+	}
+
+	return res
+}
