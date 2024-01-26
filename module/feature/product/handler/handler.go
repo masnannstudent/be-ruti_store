@@ -32,12 +32,24 @@ func (h *ProductHandler) GetAllProducts(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
 	}
 
-	result, totalItems, err := h.service.GetAllProducts(currentPage, pageSize)
-	if err != nil {
-		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	searchQuery := c.Query("search")
+
+	var result []*entities.ProductModels
+	var totalItems int64
+
+	if searchQuery != "" {
+		result, totalItems, err = h.service.SearchAndPaginateProducts(searchQuery, currentPage, pageSize)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get products: "+err.Error())
+		}
+	} else {
+		result, totalItems, err = h.service.GetAllProducts(currentPage, pageSize)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get products: "+err.Error())
+		}
 	}
 
-	currentPage, totalPages, nextPage, prevPage, err := h.service.GetProductsPage(currentPage, pageSize)
+	totalPages, nextPage, prevPage, err := h.service.GetProductsPage(currentPage, pageSize, int(totalItems))
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
 	}
@@ -167,7 +179,7 @@ func (h *ProductHandler) GetAllProductsReview(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
-	currentPage, totalPages, nextPage, prevPage, err := h.service.GetProductsPage(currentPage, pageSize)
+	totalPages, nextPage, prevPage, err := h.service.GetProductsPage(currentPage, pageSize, int(totalItems))
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
 	}
