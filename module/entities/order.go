@@ -26,16 +26,15 @@ type OrderModels struct {
 }
 
 type OrderDetailsModels struct {
-	ID               uint64        `gorm:"column:id;primaryKey" json:"id"`
-	OrderID          string        `gorm:"column:order_id;type:VARCHAR(255)" json:"order_id"`
-	ProductID        uint64        `gorm:"column:product_id" json:"product_id"`
-	Size             string        `gorm:"column:size;type:VARCHAR(255)" json:"size"`
-	Quantity         uint64        `gorm:"column:quantity" json:"quantity"`
-	TotalDiscount    uint64        `gorm:"column:total_discount" json:"total_discount"`
-	TotalGramPlastic uint64        `gorm:"column:total_gram_plastic" json:"total_gram_plastic"`
-	TotalExp         uint64        `gorm:"column:total_exp" json:"total_exp"`
-	TotalPrice       uint64        `gorm:"column:total_price" json:"total_price"`
-	Product          ProductModels `json:"product,omitempty" gorm:"foreignKey:ProductID"`
+	ID            uint64        `gorm:"column:id;primaryKey" json:"id"`
+	OrderID       string        `gorm:"column:order_id;type:VARCHAR(255)" json:"order_id"`
+	ProductID     uint64        `gorm:"column:product_id" json:"product_id"`
+	Size          string        `gorm:"column:size;type:VARCHAR(255)" json:"size"`
+	Quantity      uint64        `gorm:"column:quantity" json:"quantity"`
+	IsReviewed    bool          `gorm:"column:is_reviewed" json:"is_reviewed"`
+	TotalDiscount uint64        `gorm:"column:total_discount" json:"total_discount"`
+	TotalPrice    uint64        `gorm:"column:total_price" json:"total_price"`
+	Product       ProductModels `json:"product,omitempty" gorm:"foreignKey:ProductID"`
 }
 
 func (OrderModels) TableName() string {

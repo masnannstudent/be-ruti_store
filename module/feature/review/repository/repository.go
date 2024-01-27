@@ -84,3 +84,14 @@ func (r *ReviewRepository) CountAverageRating(productID uint64) (float64, error)
 
 	return averageRating, nil
 }
+
+func (r *ReviewRepository) SetIsReviewed(orderDetailsID, productID uint64) error {
+	if err := r.db.Model(&entities.OrderDetailsModels{}).
+		Where("id = ? AND product_id = ?", orderDetailsID, productID).
+		Update("is_reviewed", true).
+		Error; err != nil {
+		return err
+	}
+
+	return nil
+}

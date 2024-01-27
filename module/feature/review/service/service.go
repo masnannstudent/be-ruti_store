@@ -75,11 +75,12 @@ func (s *ReviewService) CreateReview(userID uint64, req *domain.CreateReviewRequ
 	}
 
 	value := &entities.ReviewModels{
-		UserID:      userID,
-		ProductID:   products.ID,
-		Rating:      req.Rating,
-		Description: req.Description,
-		CreatedAt:   time.Now(),
+		UserID:         userID,
+		ProductID:      products.ID,
+		OrderDetailsID: req.OrderDetailsID,
+		Rating:         req.Rating,
+		Description:    req.Description,
+		CreatedAt:      time.Now(),
 	}
 
 	createdReview, err := s.repo.CreateReview(value)
@@ -100,6 +101,11 @@ func (s *ReviewService) CreateReview(userID uint64, req *domain.CreateReviewRequ
 	err = s.productService.UpdateProductRating(createdReview.ProductID, averageRating)
 	if err != nil {
 		return nil, errors.New("failed to update product rating")
+	}
+
+	err = s.repo.SetIsReviewed(req.OrderDetailsID, createdReview.ProductID)
+	if err != nil {
+		return nil, errors.New("failed to set is_reviewed in order details")
 	}
 
 	return createdReview, nil
