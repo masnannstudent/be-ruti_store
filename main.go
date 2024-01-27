@@ -8,6 +8,7 @@ import (
 	"ruti-store/module/feature/route"
 	"ruti-store/module/feature/user/repository"
 	"ruti-store/module/feature/user/service"
+	assistant "ruti-store/utils/assitant"
 	"ruti-store/utils/database"
 	"ruti-store/utils/payment"
 	"ruti-store/utils/token"
@@ -22,7 +23,8 @@ func main() {
 	db := database.InitPGSDatabase(*initConfig)
 	snapClient := payment.InitSnapMidtrans(*initConfig)
 	coreClient := payment.InitCoreMidtrans(*initConfig)
-	userRepo := repository.NewUserRepository(db)
+	openAi := assistant.NewAssistantService()
+	userRepo := repository.NewUserRepository(db, openAi)
 	userService := service.NewUserService(userRepo)
 
 	database.Migrate(db)
