@@ -26,15 +26,15 @@ type OrderResponse struct {
 }
 
 type OrderDetailResponse struct {
-	ID               uint64          `json:"id"`
-	OrderID          string          `json:"order_id"`
-	ProductID        uint64          `json:"product_id"`
-	Size             string          `json:"size"`
-	Quantity         uint64          `json:"quantity"`
-	TotalGramPlastic uint64          `json:"total_gram_plastic"`
-	TotalPrice       uint64          `json:"total_price"`
-	TotalDiscount    uint64          `json:"total_discount"`
-	Product          ProductResponse `json:"product,omitempty"`
+	ID            uint64          `json:"id"`
+	OrderID       string          `json:"order_id"`
+	ProductID     uint64          `json:"product_id"`
+	IsReviewed    bool            `json:"is_reviewed"`
+	Size          string          `json:"size"`
+	Quantity      uint64          `json:"quantity"`
+	TotalPrice    uint64          `json:"total_price"`
+	TotalDiscount uint64          `json:"total_discount"`
+	Product       ProductResponse `json:"product,omitempty"`
 }
 
 type ProductPhotoResponse struct {
@@ -117,14 +117,14 @@ func FormatOrderDetail(order *entities.OrderModels) OrderResponse {
 		}
 
 		orderDetail := OrderDetailResponse{
-			ID:               detail.ID,
-			OrderID:          detail.OrderID,
-			ProductID:        detail.ProductID,
-			Size:             detail.Size,
-			Quantity:         detail.Quantity,
-			TotalGramPlastic: detail.TotalGramPlastic,
-			TotalPrice:       detail.TotalPrice,
-			TotalDiscount:    detail.TotalDiscount,
+			ID:            detail.ID,
+			OrderID:       detail.OrderID,
+			ProductID:     detail.ProductID,
+			IsReviewed:    detail.IsReviewed,
+			Size:          detail.Size,
+			Quantity:      detail.Quantity,
+			TotalPrice:    detail.TotalPrice,
+			TotalDiscount: detail.TotalDiscount,
 			Product: ProductResponse{
 				ID:            detail.Product.ID,
 				Name:          detail.Product.Name,
@@ -363,14 +363,14 @@ func FormatGetAllOrderUser(order *entities.OrderModels) *GetAllOrderUserResponse
 		}
 
 		orderDetail := OrderDetailResponse{
-			ID:               detail.ID,
-			OrderID:          detail.OrderID,
-			ProductID:        detail.ProductID,
-			Size:             detail.Size,
-			Quantity:         detail.Quantity,
-			TotalGramPlastic: detail.TotalGramPlastic,
-			TotalPrice:       detail.TotalPrice,
-			TotalDiscount:    detail.TotalDiscount,
+			ID:            detail.ID,
+			OrderID:       detail.OrderID,
+			ProductID:     detail.ProductID,
+			IsReviewed:    detail.IsReviewed,
+			Size:          detail.Size,
+			Quantity:      detail.Quantity,
+			TotalPrice:    detail.TotalPrice,
+			TotalDiscount: detail.TotalDiscount,
 			Product: ProductResponse{
 				ID:            detail.Product.ID,
 				Name:          detail.Product.Name,
@@ -434,14 +434,13 @@ func getOrderDetailResponses(data []entities.OrderDetailsModels) []OrderDetailRe
 		productPhotos := buildProductPhotoResponses(detail.Product.Photos)
 
 		orderDetail := OrderDetailResponse{
-			ID:               detail.ID,
-			OrderID:          detail.OrderID,
-			ProductID:        detail.ProductID,
-			Size:             detail.Size,
-			Quantity:         detail.Quantity,
-			TotalGramPlastic: detail.TotalGramPlastic,
-			TotalPrice:       detail.TotalPrice,
-			TotalDiscount:    detail.TotalDiscount,
+			ID:            detail.ID,
+			OrderID:       detail.OrderID,
+			ProductID:     detail.ProductID,
+			Size:          detail.Size,
+			Quantity:      detail.Quantity,
+			TotalPrice:    detail.TotalPrice,
+			TotalDiscount: detail.TotalDiscount,
 			Product: ProductResponse{
 				ID:            detail.Product.ID,
 				Name:          detail.Product.Name,
