@@ -333,12 +333,12 @@ func (h *OrderHandler) GetOrderUser(c *fiber.Ctx) error {
 	if filterQuery != "" {
 		result, totalItems, err = h.service.GetAllOrdersWithFilter(currentUser.ID, filterQuery, currentPage, pageSize)
 		if err != nil {
-			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get products: "+err.Error())
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 		}
 	} else {
 		result, totalItems, err = h.service.GetAllOrdersByUserID(currentUser.ID, currentPage, pageSize)
 		if err != nil {
-			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get products: "+err.Error())
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 		}
 	}
 

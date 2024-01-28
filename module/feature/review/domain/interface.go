@@ -12,6 +12,7 @@ type ReviewRepositoryInterface interface {
 	CreateReview(newData *entities.ReviewModels) (*entities.ReviewModels, error)
 	CreateReviewImages(newData *entities.ReviewPhotoModels) (*entities.ReviewPhotoModels, error)
 	CountAverageRating(productID uint64) (float64, error)
+	SetIsReviewed(orderDetailsID, productID uint64) error
 }
 
 type ReviewServiceInterface interface {
