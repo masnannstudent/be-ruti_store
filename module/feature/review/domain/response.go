@@ -13,14 +13,15 @@ type ReviewPhotoResponse struct {
 }
 
 type ReviewResponse struct {
-	ID          uint64                `json:"id"`
-	UserID      uint64                `json:"user_id"`
-	User        UserResponse          `json:"user"`
-	ProductID   uint64                `json:"product_id"`
-	Rating      uint64                `json:"rating"`
-	Description string                `json:"description"`
-	CreatedAt   time.Time             `json:"created_at"`
-	Photos      []ReviewPhotoResponse `json:"photos"`
+	ID             uint64                `json:"id"`
+	UserID         uint64                `json:"user_id"`
+	User           UserResponse          `json:"user"`
+	ProductID      uint64                `json:"product_id"`
+	OrderDetailsID uint64                `json:"order_details_id"`
+	Rating         uint64                `json:"rating"`
+	Description    string                `json:"description"`
+	CreatedAt      time.Time             `json:"created_at"`
+	Photos         []ReviewPhotoResponse `json:"photos"`
 }
 
 type UserResponse struct {
@@ -39,11 +40,12 @@ func ResponseArrayReviews(data []*entities.ReviewModels) []*ReviewResponse {
 				Name:         review.User.Name,
 				PhotoProfile: review.User.PhotoProfile,
 			},
-			ProductID:   review.ProductID,
-			Rating:      review.Rating,
-			Description: review.Description,
-			CreatedAt:   review.CreatedAt,
-			Photos:      FormatReviewPhotos(review.Photos),
+			ProductID:      review.ProductID,
+			OrderDetailsID: review.OrderDetailsID,
+			Rating:         review.Rating,
+			Description:    review.Description,
+			CreatedAt:      review.CreatedAt,
+			Photos:         FormatReviewPhotos(review.Photos),
 		}
 		res = append(res, reviewRes)
 	}
@@ -53,13 +55,14 @@ func ResponseArrayReviews(data []*entities.ReviewModels) []*ReviewResponse {
 
 func ReviewFormatter(review *entities.ReviewModels) *ReviewResponse {
 	return &ReviewResponse{
-		ID:          review.ID,
-		UserID:      review.UserID,
-		ProductID:   review.ProductID,
-		Rating:      review.Rating,
-		Description: review.Description,
-		CreatedAt:   review.CreatedAt,
-		Photos:      FormatReviewPhotos(review.Photos),
+		ID:             review.ID,
+		UserID:         review.UserID,
+		ProductID:      review.ProductID,
+		OrderDetailsID: review.OrderDetailsID,
+		Rating:         review.Rating,
+		Description:    review.Description,
+		CreatedAt:      review.CreatedAt,
+		Photos:         FormatReviewPhotos(review.Photos),
 	}
 }
 
@@ -88,4 +91,26 @@ func FormatCreateReviewPhotos(photo *entities.ReviewPhotoModels) *ReviewPhotosFo
 	}
 
 	return formattedPhoto
+}
+
+type CreateReviewResponse struct {
+	ID             uint64    `json:"id"`
+	UserID         uint64    `json:"user_id"`
+	ProductID      uint64    `json:"product_id"`
+	OrderDetailsID uint64    `json:"order_details_id"`
+	Rating         uint64    `json:"rating"`
+	Description    string    `json:"description"`
+	CreatedAt      time.Time `json:"created_at"`
+}
+
+func CreateReviewFormatter(review *entities.ReviewModels) *CreateReviewResponse {
+	return &CreateReviewResponse{
+		ID:             review.ID,
+		UserID:         review.UserID,
+		ProductID:      review.ProductID,
+		OrderDetailsID: review.OrderDetailsID,
+		Rating:         review.Rating,
+		Description:    review.Description,
+		CreatedAt:      review.CreatedAt,
+	}
 }
