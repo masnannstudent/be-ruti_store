@@ -81,3 +81,11 @@ func (s *UserService) GetUserPage(currentPage, pageSize int) (int, int, int, int
 
 	return currentPage, totalPages, nextPage, prevPage, nil
 }
+
+func (s *UserService) ChatBot(req *domain.CreateChatBotRequest) (string, error) {
+	result, err := s.repo.ChatBotAI(req)
+	if err != nil {
+		return "", err
+	}
+	return result, nil
+}

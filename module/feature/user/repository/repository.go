@@ -1,18 +1,24 @@
 package repository
 
 import (
+	"context"
+	"errors"
+	"github.com/sashabaranov/go-openai"
 	"gorm.io/gorm"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/user/domain"
+	assistant "ruti-store/utils/assitant"
 )
 
 type UserRepository struct {
-	db *gorm.DB
+	db     *gorm.DB
+	openAi assistant.AssistantServiceInterface
 }
 
-func NewUserRepository(db *gorm.DB) domain.UserRepositoryInterface {
+func NewUserRepository(db *gorm.DB, openAi assistant.AssistantServiceInterface) domain.UserRepositoryInterface {
 	return &UserRepository{
-		db: db,
+		db:     db,
+		openAi: openAi,
 	}
 }
 
@@ -59,4 +65,40 @@ func (r *UserRepository) GetPaginatedUsers(page, pageSize int) ([]*entities.User
 	}
 
 	return users, nil
+}
+
+func (r *UserRepository) ChatBotAI(req *domain.CreateChatBotRequest) (string, error) {
+	chat := []openai.ChatCompletionMessage{
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "Nama kamu adalah Ruti Bot",
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "Kamu adalah seorang chatbot yang bertugas untuk memberikan tips dan saran mengenai dunia fashion",
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "Kamu adalah hanya boleh menjawab pertanyaan mengenai dunia fashion",
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "Berikan jawaban maksimal 20 kata",
+		},
+		{
+			Role:    openai.ChatMessageRoleAssistant,
+			Content: req.Message,
+		},
+	}
+
+	response, err := r.openAi.GetAnswerFromAi(chat, context.Background())
+	if err != nil {
+		return "", err
+	}
+
+	if len(response.Choices) > 0 {
+		return response.Choices[0].Message.Content, nil
+	}
+
+	return "", errors.New("no response from the chatbot")
 }

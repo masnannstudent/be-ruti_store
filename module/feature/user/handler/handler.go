@@ -124,3 +124,21 @@ func (h *UserHandler) GetAllUser(c *fiber.Ctx) error {
 	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
 		domain.ResponseArrayUser(result), currentPage, int(totalItems), totalPages, nextPage, prevPage)
 }
+
+func (h *UserHandler) ChatBot(c *fiber.Ctx) error {
+	req := new(domain.CreateChatBotRequest)
+	if err := c.BodyParser(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Failed to parse request body")
+	}
+
+	if err := validator.ValidateStruct(req); err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	result, err := h.service.ChatBot(req)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved chat-bot", result)
+}

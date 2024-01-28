@@ -53,7 +53,7 @@ func InitializeOrder(db *gorm.DB, snapClient snap.Client, coreClient coreapi.Cli
 	ship = shipping.NewShippingService()
 	addressRepo = addressRepository.NewAddressRepository(db, ship)
 	addressServ = addressService.NewAddressService(addressRepo)
-	userRepo = userRepository.NewUserRepository(db)
+	userRepo = userRepository.NewUserRepository(db, openAi)
 	userServ = userService.NewUserService(userRepo)
 	notificationRepo = notificationRepository.NewNotificationRepository(db)
 	notificationServ = notificationService.NewNotificationService(notificationRepo)

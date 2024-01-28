@@ -9,3 +9,7 @@ type EditProfileRequest struct {
 	Gender       string    `form:"gender" json:"gender"`
 	DateOfBirth  time.Time `form:"date_of_birth" json:"date_of_birth"`
 }
+
+type CreateChatBotRequest struct {
+	Message string `json:"message" validate:"required"`
+}
