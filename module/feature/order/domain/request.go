@@ -14,7 +14,8 @@ type CreatePaymentRequest struct {
 
 type CreateOrderRequest struct {
 	AddressID uint64 `form:"address_id" json:"address_id" validate:"required"`
-	Size      string `form:"size" json:"size" validate:"required"`
+	Size      string `form:"size" json:"size"`
+	Color     string `form:"color" json:"color"`
 	Note      string `form:"note" json:"note"`
 	ProductID uint64 `json:"product_id" validate:"required"`
 	Quantity  uint64 `json:"quantity" validate:"required"`
@@ -38,7 +39,8 @@ type CreateNotificationPaymentRequest struct {
 
 type CreateCartRequest struct {
 	ProductID uint64 `json:"product_id" validate:"required"`
-	Size      string `form:"size" json:"size" validate:"required"`
+	Size      string `form:"size" json:"size"`
+	Color     string `form:"color" json:"color"`
 	Quantity  uint64 `json:"quantity" validate:"required,min=1"`
 }
 

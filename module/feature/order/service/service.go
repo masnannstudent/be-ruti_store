@@ -104,6 +104,7 @@ func (s *OrderService) CreateOrder(userID uint64, request *domain.CreateOrderReq
 		OrderID:       orderID,
 		ProductID:     request.ProductID,
 		Size:          request.Size,
+		Color:         request.Color,
 		Quantity:      request.Quantity,
 		IsReviewed:    false,
 		TotalPrice:    request.Quantity * (products.Price - products.Discount),
@@ -373,6 +374,7 @@ func (s *OrderService) CreateCart(userID uint64, req *domain.CreateCartRequest) 
 		UserID:    user.ID,
 		ProductID: products.ID,
 		Size:      req.Size,
+		Color:     req.Color,
 		Quantity:  req.Quantity,
 	}
 
@@ -450,6 +452,7 @@ func (s *OrderService) CreateOrderCart(userID uint64, request *domain.CreateOrde
 			OrderID:       orderID,
 			ProductID:     products.ID,
 			Size:          cartItem.Size,
+			Color:         cartItem.Color,
 			Quantity:      cartItem.Quantity,
 			IsReviewed:    false,
 			TotalPrice:    cartItem.Quantity * (products.Price - products.Discount),
