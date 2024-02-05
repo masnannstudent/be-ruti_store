@@ -11,6 +11,7 @@ type ProductModels struct {
 	Rating       float64              `gorm:"column:rating" json:"rating"`
 	TotalReviews uint64               `gorm:"column:total_reviews" json:"total_reviews"`
 	Size         string               `gorm:"column:size;type:VARCHAR(255)" json:"size"`
+	Color        string               `gorm:"column:color;type:VARCHAR(255)" json:"color"`
 	Stock        uint64               `gorm:"column:stock" json:"stock"`
 	Weight       uint64               `gorm:"column:weight" json:"weight"`
 	CreatedAt    time.Time            `gorm:"column:created_at;type:timestamp" json:"created_at"`

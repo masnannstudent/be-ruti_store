@@ -30,6 +30,7 @@ type OrderDetailsModels struct {
 	OrderID       string        `gorm:"column:order_id;type:VARCHAR(255)" json:"order_id"`
 	ProductID     uint64        `gorm:"column:product_id" json:"product_id"`
 	Size          string        `gorm:"column:size;type:VARCHAR(255)" json:"size"`
+	Color         string        `gorm:"column:color;type:VARCHAR(255)" json:"color"`
 	Quantity      uint64        `gorm:"column:quantity" json:"quantity"`
 	IsReviewed    bool          `gorm:"column:is_reviewed" json:"is_reviewed"`
 	TotalDiscount uint64        `gorm:"column:total_discount" json:"total_discount"`

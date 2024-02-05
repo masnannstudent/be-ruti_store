@@ -90,7 +90,7 @@ func (h *ReviewHandler) CreateReview(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
-	return response.SuccessBuildResponse(c, fiber.StatusCreated, "Success create review", domain.ReviewFormatter(result))
+	return response.SuccessBuildResponse(c, fiber.StatusCreated, "Success create review", domain.CreateReviewFormatter(result))
 }
 
 func (h *ReviewHandler) CreateReviewPhoto(c *fiber.Ctx) error {
