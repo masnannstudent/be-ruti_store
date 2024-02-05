@@ -31,6 +31,7 @@ type OrderDetailResponse struct {
 	ProductID     uint64          `json:"product_id"`
 	IsReviewed    bool            `json:"is_reviewed"`
 	Size          string          `json:"size"`
+	Color         string          `json:"color"`
 	Quantity      uint64          `json:"quantity"`
 	TotalPrice    uint64          `json:"total_price"`
 	TotalDiscount uint64          `json:"total_discount"`
@@ -122,6 +123,7 @@ func FormatOrderDetail(order *entities.OrderModels) OrderResponse {
 			ProductID:     detail.ProductID,
 			IsReviewed:    detail.IsReviewed,
 			Size:          detail.Size,
+			Color:         detail.Color,
 			Quantity:      detail.Quantity,
 			TotalPrice:    detail.TotalPrice,
 			TotalDiscount: detail.TotalDiscount,
@@ -255,6 +257,7 @@ type CreateCartResponse struct {
 	UserID    uint64 `json:"user_id"`
 	ProductID uint64 `json:"product_id"`
 	Size      string `json:"size"`
+	Color     string `json:"color"`
 	Quantity  uint64 `json:"quantity"`
 }
 
@@ -264,6 +267,7 @@ func CreateCartFormatter(cart *entities.CartModels) *CreateCartResponse {
 		UserID:    cart.UserID,
 		ProductID: cart.ProductID,
 		Size:      cart.Size,
+		Color:     cart.Color,
 		Quantity:  cart.Quantity,
 	}
 }
@@ -273,6 +277,7 @@ type CartResponse struct {
 	UserID    uint64           `json:"user_id"`
 	ProductID uint64           `json:"product_id"`
 	Size      string           `json:"size"`
+	Color     string           `json:"color"`
 	Quantity  uint64           `json:"quantity"`
 	Product   *ProductResponse `json:"product"`
 }
@@ -304,6 +309,7 @@ func CartFormatter(cart *entities.CartModels) *CartResponse {
 		UserID:    cart.UserID,
 		ProductID: cart.ProductID,
 		Size:      cart.Size,
+		Color:     cart.Color,
 		Quantity:  cart.Quantity,
 		Product:   buildProductResponse(&cart.Product),
 	}
@@ -318,6 +324,7 @@ func ResponseArrayCart(data []*entities.CartModels) []*CartResponse {
 			UserID:    cart.UserID,
 			ProductID: cart.ProductID,
 			Size:      cart.Size,
+			Color:     cart.Color,
 			Quantity:  cart.Quantity,
 			Product:   buildProductResponse(&cart.Product),
 		}
@@ -368,6 +375,7 @@ func FormatGetAllOrderUser(order *entities.OrderModels) *GetAllOrderUserResponse
 			ProductID:     detail.ProductID,
 			IsReviewed:    detail.IsReviewed,
 			Size:          detail.Size,
+			Color:         detail.Color,
 			Quantity:      detail.Quantity,
 			TotalPrice:    detail.TotalPrice,
 			TotalDiscount: detail.TotalDiscount,
@@ -438,6 +446,7 @@ func getOrderDetailResponses(data []entities.OrderDetailsModels) []OrderDetailRe
 			OrderID:       detail.OrderID,
 			ProductID:     detail.ProductID,
 			Size:          detail.Size,
+			Color:         detail.Color,
 			Quantity:      detail.Quantity,
 			TotalPrice:    detail.TotalPrice,
 			TotalDiscount: detail.TotalDiscount,
