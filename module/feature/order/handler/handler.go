@@ -2,12 +2,15 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/order/domain"
+	"ruti-store/utils/export"
 	"ruti-store/utils/response"
 	"ruti-store/utils/validator"
 	"strconv"
+	"time"
 )
 
 type OrderHandler struct {
@@ -371,4 +374,67 @@ func (h *OrderHandler) GetCartByID(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 	return response.SuccessBuildResponse(c, fiber.StatusOK, "Success get cart by id", domain.CartFormatter(result))
+}
+
+func (h *OrderHandler) GetReportOrder(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+
+	startDateParam := c.Query("start_date")
+	endDateParam := c.Query("end_date")
+
+	startDate, err := time.Parse("2006-01-02", startDateParam)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid start date format. Use YYYY-MM-DD.")
+	}
+
+	endDate, err := time.Parse("2006-01-02", endDateParam)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid end date format. Use YYYY-MM-DD.")
+	}
+
+	result, err := h.service.GetReportOrder(startDate, endDate)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	headers := []string{
+		"ID Pesanan", "Nama", "Email",
+		"Catatan", "Total Kuantitas", "Total Harga",
+		"Total Diskon", "Total Bayar", "Status Pesanan",
+		"Status Pembayaran", "Dibuat Pada",
+	}
+
+	title := fmt.Sprintf("Laporan Pesanan Bulan %s", startDate.Format("January 2006"))
+
+	var data [][]interface{}
+	for _, order := range result {
+		data = append(data, []interface{}{
+			order.IdOrder,
+			order.User.Name,
+			order.User.Email,
+			order.Note,
+			order.GrandTotalQuantity,
+			order.GrandTotalPrice,
+			order.GrandTotalDiscount,
+			order.TotalAmountPaid,
+			order.OrderStatus,
+			order.PaymentStatus,
+			order.CreatedAt.Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	fileName := fmt.Sprintf("Laporan Penjualan_%s.xlsx", startDate.Format("January 2006"))
+	err = export.ExportXlsx(c, data, headers, title, fileName)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Error exporting to Xlx: "+err.Error())
+	}
+
+	return nil
 }

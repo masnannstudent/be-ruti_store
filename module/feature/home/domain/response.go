@@ -58,7 +58,7 @@ type OrderSummaryResponse struct {
 	Name            string    `json:"name"`
 	Date            time.Time `json:"date"`
 	TotalAmountPaid uint64    `json:"total_amount_paid"`
-	OrderStatus     string    `json:"order_status"`
+	PaymentStatus   string    `json:"payment_status"`
 }
 
 func ResponseArrayOrderSummary(data []*entities.OrderModels) []*OrderSummaryResponse {
@@ -70,7 +70,7 @@ func ResponseArrayOrderSummary(data []*entities.OrderModels) []*OrderSummaryResp
 			Name:            order.User.Name,
 			Date:            order.CreatedAt,
 			TotalAmountPaid: order.TotalAmountPaid,
-			OrderStatus:     order.OrderStatus,
+			PaymentStatus:   order.PaymentStatus,
 		}
 		res = append(res, orderRes)
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/midtrans/midtrans-go/snap"
 	"ruti-store/module/entities"
+	"time"
 )
 
 type OrderRepositoryInterface interface {
@@ -26,6 +27,7 @@ type OrderRepositoryInterface interface {
 	RemoveProductFromCart(userID, productID uint64) error
 	GetAllOrdersUserWithFilter(userID uint64, orderStatus string, page, pageSize int) ([]*entities.OrderModels, int64, error)
 	GetAllOrdersSearch(page, perPage int, name string) ([]*entities.OrderModels, int64, error)
+	GetReportOrder(startDate, endDate time.Time) ([]*entities.OrderModels, error)
 }
 
 type OrderServiceInterface interface {
@@ -44,6 +46,7 @@ type OrderServiceInterface interface {
 	GetCartById(cartID uint64) (*entities.CartModels, error)
 	GetAllOrdersWithFilter(userID uint64, orderStatus string, page, pageSize int) ([]*entities.OrderModels, int64, error)
 	SearchAndPaginateOrder(page, pageSize int, name string) ([]*entities.OrderModels, int64, error)
+	GetReportOrder(starDate, endDate time.Time) ([]*entities.OrderModels, error)
 }
 
 type OrderHandlerInterface interface {
@@ -60,4 +63,5 @@ type OrderHandlerInterface interface {
 	GetOrderByID(c *fiber.Ctx) error
 	GetOrderUser(c *fiber.Ctx) error
 	GetCartByID(c *fiber.Ctx) error
+	GetReportOrder(c *fiber.Ctx) error
 }
