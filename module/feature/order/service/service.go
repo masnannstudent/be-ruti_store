@@ -654,3 +654,19 @@ func (s *OrderService) SearchFilterAndPaginatePayment(page, pageSize int, name, 
 	}
 	return result, totalItems, nil
 }
+
+func (s *OrderService) FilterAndPaginateOrder(page, pageSize int, filter string) ([]*entities.OrderModels, int64, error) {
+	result, totalItems, err := s.repo.GetAllOrderFilter(page, pageSize, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+	return result, totalItems, nil
+}
+
+func (s *OrderService) SearchFilterAndPaginateOrder(page, pageSize int, name, filter string) ([]*entities.OrderModels, int64, error) {
+	result, totalItems, err := s.repo.GetAllOrderFilterAndSearch(page, pageSize, name, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+	return result, totalItems, nil
+}
