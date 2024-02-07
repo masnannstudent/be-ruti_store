@@ -95,21 +95,19 @@ func (h *OrderHandler) GetAllPayment(c *fiber.Ctx) error {
 	var result []*entities.OrderModels
 	var totalItems int64
 
-	if searchQuery != "" {
+	switch {
+	case searchQuery != "" && filterQuery != "":
+		result, totalItems, err = h.service.SearchFilterAndPaginatePayment(currentPage, pageSize, searchQuery, filterQuery)
+	case searchQuery != "":
 		result, totalItems, err = h.service.SearchAndPaginateOrder(currentPage, pageSize, searchQuery)
-		if err != nil {
-			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
-		}
-	} else if filterQuery != "" {
-		result, totalItems, err = h.service.FilterAndPaginateOrder(currentPage, pageSize, filterQuery)
-		if err != nil {
-			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
-		}
-	} else {
+	case filterQuery != "":
+		result, totalItems, err = h.service.FilterAndPaginatePayment(currentPage, pageSize, filterQuery)
+	default:
 		result, totalItems, err = h.service.GetAllOrders(currentPage, pageSize)
-		if err != nil {
-			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
-		}
+	}
+
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
 	totalPages, nextPage, prevPage, err := h.service.GetOrdersPage(currentPage, pageSize, int(totalItems))

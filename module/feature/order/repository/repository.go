@@ -271,7 +271,7 @@ func (r *OrderRepository) GetReportOrder(startDate, endDate time.Time) ([]*entit
 	return orders, nil
 }
 
-func (r *OrderRepository) GetAllOrdersFilter(page, perPage int, filter string) ([]*entities.OrderModels, int64, error) {
+func (r *OrderRepository) GetAllPaymentFilter(page, perPage int, filter string) ([]*entities.OrderModels, int64, error) {
 	var orders []*entities.OrderModels
 	var totalItems int64
 
@@ -281,6 +281,25 @@ func (r *OrderRepository) GetAllOrdersFilter(page, perPage int, filter string) (
 		Preload("User").
 		Where("payment_status = ?", filter).
 		Where("deleted_at IS NULL").
+		Count(&totalItems).
+		Offset(offset).Limit(perPage).Find(&orders).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return orders, totalItems, nil
+}
+
+func (r *OrderRepository) GetAllPaymentFilterAndSearch(page, perPage int, name, filter string) ([]*entities.OrderModels, int64, error) {
+	var orders []*entities.OrderModels
+	var totalItems int64
+
+	offset := (page - 1) * perPage
+
+	if err := r.db.Model(&entities.OrderModels{}).
+		Preload("User").
+		Joins("JOIN users ON users.id = orders.user_id").
+		Where("users.name LIKE ? AND orders.payment_status = ?", "%"+name+"%", filter).
+		Where("orders.deleted_at IS NULL").
 		Count(&totalItems).
 		Offset(offset).Limit(perPage).Find(&orders).Error; err != nil {
 		return nil, 0, err
