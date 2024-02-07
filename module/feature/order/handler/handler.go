@@ -90,12 +90,18 @@ func (h *OrderHandler) GetAllPayment(c *fiber.Ctx) error {
 	}
 
 	searchQuery := c.Query("search")
+	filterQuery := c.Query("filter")
 
 	var result []*entities.OrderModels
 	var totalItems int64
 
 	if searchQuery != "" {
 		result, totalItems, err = h.service.SearchAndPaginateOrder(currentPage, pageSize, searchQuery)
+		if err != nil {
+			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+		}
+	} else if filterQuery != "" {
+		result, totalItems, err = h.service.FilterAndPaginateOrder(currentPage, pageSize, filterQuery)
 		if err != nil {
 			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 		}
