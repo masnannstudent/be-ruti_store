@@ -474,3 +474,51 @@ func getOrderDetailResponses(data []entities.OrderDetailsModels) []OrderDetailRe
 
 	return res
 }
+
+type OrderReportResponse struct {
+	IdOrder            string                  `json:"id_order"`
+	UserID             uint64                  `json:"user_id"`
+	Note               string                  `json:"note"`
+	GrandTotalQuantity uint64                  `json:"grand_total_quantity"`
+	GrandTotalPrice    uint64                  `json:"grand_total_price"`
+	GrandTotalDiscount uint64                  `json:"grand_total_discount"`
+	TotalAmountPaid    uint64                  `json:"total_amount_paid"`
+	OrderStatus        string                  `json:"order_status"`
+	PaymentStatus      string                  `json:"payment_status"`
+	CreatedAt          time.Time               `json:"created_at"`
+	User               OrderReportUserResponse `json:"user"`
+}
+
+type OrderReportUserResponse struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
+func OrderReportFormatter(order *entities.OrderModels) *OrderReportResponse {
+	return &OrderReportResponse{
+		IdOrder:            order.IdOrder,
+		UserID:             order.UserID,
+		Note:               order.Note,
+		GrandTotalQuantity: order.GrandTotalQuantity,
+		GrandTotalPrice:    order.GrandTotalPrice,
+		GrandTotalDiscount: order.GrandTotalDiscount,
+		TotalAmountPaid:    order.TotalAmountPaid,
+		OrderStatus:        order.OrderStatus,
+		PaymentStatus:      order.PaymentStatus,
+		CreatedAt:          order.CreatedAt,
+		User: OrderReportUserResponse{
+			Name:  order.User.Name,
+			Email: order.User.Email,
+		},
+	}
+}
+
+func ResponseArrayOrderReport(data []*entities.OrderModels) []*OrderReportResponse {
+	res := make([]*OrderReportResponse, len(data))
+
+	for i, order := range data {
+		res[i] = OrderReportFormatter(order)
+	}
+
+	return res
+}

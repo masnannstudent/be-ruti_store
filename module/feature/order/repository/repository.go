@@ -7,6 +7,7 @@ import (
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/order/domain"
 	"ruti-store/utils/payment"
+	"time"
 )
 
 type OrderRepository struct {
@@ -255,3 +256,17 @@ func (r *OrderRepository) GetAllOrdersSearch(page, perPage int, name string) ([]
 	return orders, totalItems, nil
 }
 
+func (r *OrderRepository) GetReportOrder(startDate, endDate time.Time) ([]*entities.OrderModels, error) {
+	var orders []*entities.OrderModels
+
+	err := r.db.Where("deleted_at IS NULL").
+		Where("created_at BETWEEN ? AND ?", startDate, endDate).
+		Order("created_at DESC").
+		Preload("User").
+		Find(&orders).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}
