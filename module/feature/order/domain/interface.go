@@ -28,6 +28,10 @@ type OrderRepositoryInterface interface {
 	GetAllOrdersUserWithFilter(userID uint64, orderStatus string, page, pageSize int) ([]*entities.OrderModels, int64, error)
 	GetAllOrdersSearch(page, perPage int, name string) ([]*entities.OrderModels, int64, error)
 	GetReportOrder(startDate, endDate time.Time) ([]*entities.OrderModels, error)
+	GetAllPaymentFilter(page, perPage int, filter string) ([]*entities.OrderModels, int64, error)
+	GetAllPaymentFilterAndSearch(page, perPage int, name, filter string) ([]*entities.OrderModels, int64, error)
+	GetAllOrderFilter(page, perPage int, filter string) ([]*entities.OrderModels, int64, error)
+	GetAllOrderFilterAndSearch(page, perPage int, name, filter string) ([]*entities.OrderModels, int64, error)
 }
 
 type OrderServiceInterface interface {
@@ -47,6 +51,10 @@ type OrderServiceInterface interface {
 	GetAllOrdersWithFilter(userID uint64, orderStatus string, page, pageSize int) ([]*entities.OrderModels, int64, error)
 	SearchAndPaginateOrder(page, pageSize int, name string) ([]*entities.OrderModels, int64, error)
 	GetReportOrder(starDate, endDate time.Time) ([]*entities.OrderModels, error)
+	FilterAndPaginatePayment(page, pageSize int, filter string) ([]*entities.OrderModels, int64, error)
+	SearchFilterAndPaginatePayment(page, pageSize int, name, filter string) ([]*entities.OrderModels, int64, error)
+	FilterAndPaginateOrder(page, pageSize int, filter string) ([]*entities.OrderModels, int64, error)
+	SearchFilterAndPaginateOrder(page, pageSize int, name, filter string) ([]*entities.OrderModels, int64, error)
 }
 
 type OrderHandlerInterface interface {
