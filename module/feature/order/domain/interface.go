@@ -30,6 +30,8 @@ type OrderRepositoryInterface interface {
 	GetReportOrder(startDate, endDate time.Time) ([]*entities.OrderModels, error)
 	GetAllPaymentFilter(page, perPage int, filter string) ([]*entities.OrderModels, int64, error)
 	GetAllPaymentFilterAndSearch(page, perPage int, name, filter string) ([]*entities.OrderModels, int64, error)
+	GetAllOrderFilter(page, perPage int, filter string) ([]*entities.OrderModels, int64, error)
+	GetAllOrderFilterAndSearch(page, perPage int, name, filter string) ([]*entities.OrderModels, int64, error)
 }
 
 type OrderServiceInterface interface {
@@ -51,6 +53,8 @@ type OrderServiceInterface interface {
 	GetReportOrder(starDate, endDate time.Time) ([]*entities.OrderModels, error)
 	FilterAndPaginatePayment(page, pageSize int, filter string) ([]*entities.OrderModels, int64, error)
 	SearchFilterAndPaginatePayment(page, pageSize int, name, filter string) ([]*entities.OrderModels, int64, error)
+	FilterAndPaginateOrder(page, pageSize int, filter string) ([]*entities.OrderModels, int64, error)
+	SearchFilterAndPaginateOrder(page, pageSize int, name, filter string) ([]*entities.OrderModels, int64, error)
 }
 
 type OrderHandlerInterface interface {

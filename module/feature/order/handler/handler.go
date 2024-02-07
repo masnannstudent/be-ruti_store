@@ -44,20 +44,24 @@ func (h *OrderHandler) GetAllOrders(c *fiber.Ctx) error {
 	}
 
 	searchQuery := c.Query("search")
+	filterQuery := c.Query("filter")
 
 	var result []*entities.OrderModels
 	var totalItems int64
 
-	if searchQuery != "" {
+	switch {
+	case searchQuery != "" && filterQuery != "":
+		result, totalItems, err = h.service.SearchFilterAndPaginateOrder(currentPage, pageSize, searchQuery, filterQuery)
+	case searchQuery != "":
 		result, totalItems, err = h.service.SearchAndPaginateOrder(currentPage, pageSize, searchQuery)
-		if err != nil {
-			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
-		}
-	} else {
+	case filterQuery != "":
+		result, totalItems, err = h.service.FilterAndPaginateOrder(currentPage, pageSize, filterQuery)
+	default:
 		result, totalItems, err = h.service.GetAllOrders(currentPage, pageSize)
-		if err != nil {
-			return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
-		}
+	}
+
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
 	totalPages, nextPage, prevPage, err := h.service.GetOrdersPage(currentPage, pageSize, int(totalItems))
