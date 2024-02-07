@@ -630,3 +630,11 @@ func (s *OrderService) SearchAndPaginateOrder(page, pageSize int, name string) (
 	}
 	return result, totalItems, nil
 }
+
+func (s *OrderService) GetReportOrder(starDate, endDate time.Time) ([]*entities.OrderModels, error) {
+	result, err := s.repo.GetReportOrder(starDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
