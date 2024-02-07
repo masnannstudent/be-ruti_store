@@ -195,6 +195,7 @@ func FormatterOrder(orders []*entities.OrderModels) []*OrderPaginationResponse {
 
 // OrderSummaryResponse Get All Order
 type OrderSummaryResponse struct {
+	ID              string    `json:"id"`
 	IDOrder         string    `json:"id_order"`
 	Name            string    `json:"name"`
 	Date            time.Time `json:"date"`
@@ -207,6 +208,7 @@ func ResponseArrayOrderSummary(data []*entities.OrderModels) []*OrderSummaryResp
 
 	for _, order := range data {
 		orderRes := &OrderSummaryResponse{
+			ID:              order.ID,
 			IDOrder:         order.IdOrder,
 			Name:            order.User.Name,
 			Date:            order.CreatedAt,
@@ -221,6 +223,7 @@ func ResponseArrayOrderSummary(data []*entities.OrderModels) []*OrderSummaryResp
 
 // PaymentSummaryResponse GetAll Payment
 type PaymentSummaryResponse struct {
+	ID              string    `json:"id"`
 	IDOrder         string    `json:"id_order"`
 	Name            string    `json:"name"`
 	Date            time.Time `json:"date"`
@@ -233,6 +236,7 @@ func ResponseArrayPaymentSummary(data []*entities.OrderModels) []*PaymentSummary
 
 	for _, order := range data {
 		orderRes := &PaymentSummaryResponse{
+			ID:              order.ID,
 			IDOrder:         order.IdOrder,
 			Name:            order.User.Name,
 			Date:            order.CreatedAt,

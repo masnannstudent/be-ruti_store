@@ -9,6 +9,7 @@ import (
 	"ruti-store/module/feature/product/domain"
 	assistant "ruti-store/utils/assitant"
 	"strings"
+	"time"
 )
 
 type ProductRepository struct {
@@ -108,18 +109,29 @@ func (r *ProductRepository) UpdateProduct(productID uint64, newData *entities.Pr
 }
 
 func (r *ProductRepository) DeleteProduct(productID uint64) error {
-	var existingProduct *entities.ProductModels
-	if err := r.db.Where("id = ?", productID).Preload("Categories").First(&existingProduct).Error; err != nil {
+	var existingProduct entities.ProductModels
+
+	// Retrieve the product with associated photos and categories
+	if err := r.db.Where("id = ?", productID).Preload("Photos").Preload("Categories").First(&existingProduct).Error; err != nil {
 		return err
 	}
 
-	if len(existingProduct.Categories) > 0 {
-		if err := r.db.Model(existingProduct).Association("Categories").Delete(&existingProduct.Categories); err != nil {
+	// Delete associated photos if they exist
+	if len(existingProduct.Photos) > 0 {
+		if err := r.db.Unscoped().Delete(existingProduct.Photos).Error; err != nil {
 			return err
 		}
 	}
 
-	if err := r.db.Delete(existingProduct).Error; err != nil {
+	// Detach associated categories if they exist
+	if len(existingProduct.Categories) > 0 {
+		if err := r.db.Model(&existingProduct).Association("Categories").Delete(existingProduct.Categories); err != nil {
+			return err
+		}
+	}
+
+	// Delete the product
+	if err := r.db.Model(existingProduct).Update("deleted_at", time.Now()).Error; err != nil {
 		return err
 	}
 
