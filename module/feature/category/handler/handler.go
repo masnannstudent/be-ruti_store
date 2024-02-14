@@ -37,7 +37,7 @@ func (h *CategoryHandler) GetAllCategories(c *fiber.Ctx) error {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
 	}
 
-	currentPage, totalPages, nextPage, prevPage, err := h.service.GetCategoriesPage(currentPage, pageSize)
+	totalPages, nextPage, prevPage, err := h.service.GetCategoryPage(currentPage, pageSize, int(totalItems))
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
 	}
@@ -182,4 +182,35 @@ func (h *CategoryHandler) DeleteCategory(c *fiber.Ctx) error {
 	}
 
 	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success delete category")
+}
+
+func (h *CategoryHandler) GetAllProductByCategoryID(c *fiber.Ctx) error {
+	currentPage, err := strconv.Atoi(c.Query("page"))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page number")
+	}
+
+	pageSize, err := strconv.Atoi(c.Query("page_size"))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid page size")
+	}
+
+	id := c.Params("id")
+	categoryID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	result, totalItems, err := h.service.SearchProductByCategoryID(currentPage, pageSize, categoryID)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Internal server error occurred: "+err.Error())
+	}
+
+	totalPages, nextPage, prevPage, err := h.service.GetCategoryPage(currentPage, pageSize, int(totalItems))
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to get page info: "+err.Error())
+	}
+
+	return response.PaginationBuildResponse(c, fiber.StatusOK, "Success get pagination",
+		result, currentPage, int(totalItems), totalPages, nextPage, prevPage)
 }

@@ -11,6 +11,7 @@ type UserRepositoryInterface interface {
 	GetTotalUserItems() (int64, error)
 	GetPaginatedUsers(page, pageSize int) ([]*entities.UserModels, error)
 	ChatBotAI(req *CreateChatBotRequest) (string, error)
+	DeleteUser(userID uint64) error
 }
 
 type UserServiceInterface interface {
@@ -19,6 +20,7 @@ type UserServiceInterface interface {
 	GetAllUserItems(page, pageSize int) ([]*entities.UserModels, int64, error)
 	GetUserPage(currentPage, pageSize int) (int, int, int, int, error)
 	ChatBot(req *CreateChatBotRequest) (string, error)
+	DeleteUser(userID uint64) error
 }
 
 type UserHandlerInterface interface {
@@ -27,4 +29,5 @@ type UserHandlerInterface interface {
 	EditProfile(c *fiber.Ctx) error
 	GetAllUser(c *fiber.Ctx) error
 	ChatBot(c *fiber.Ctx) error
+	DeleteUser(c *fiber.Ctx) error
 }

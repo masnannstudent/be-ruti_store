@@ -89,3 +89,15 @@ func (s *UserService) ChatBot(req *domain.CreateChatBotRequest) (string, error) 
 	}
 	return result, nil
 }
+
+func (s *UserService) DeleteUser(userID uint64) error {
+	user, err := s.repo.GetUserByID(userID)
+	if err != nil {
+		return errors.New("user not found")
+	}
+	err = s.repo.DeleteUser(user.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

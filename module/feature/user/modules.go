@@ -33,4 +33,5 @@ func SetupRoutesUser(app *fiber.App, jwt token.JWTInterface, userService domain.
 	api.Post("/edit-profile", middleware.AuthMiddleware(jwt, userService), hand.EditProfile)
 	api.Get("/", middleware.AuthMiddleware(jwt, userService), hand.GetAllUser)
 	api.Post("/chat-bot", hand.ChatBot)
+	api.Delete("/delete/:id", middleware.AuthMiddleware(jwt, userService), hand.DeleteUser)
 }

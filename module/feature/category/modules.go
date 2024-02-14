@@ -31,4 +31,5 @@ func SetupRoutesCategory(app *fiber.App, jwt token.JWTInterface, userService use
 	api.Post("/create", middleware.AuthMiddleware(jwt, userService), hand.CreateCategory)
 	api.Put("/update/:id", middleware.AuthMiddleware(jwt, userService), hand.UpdateCategory)
 	api.Delete("/delete/:id", middleware.AuthMiddleware(jwt, userService), hand.DeleteCategory)
+	api.Get("/product/list/:id", hand.GetAllProductByCategoryID)
 }
