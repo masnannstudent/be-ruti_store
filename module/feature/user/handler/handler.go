@@ -142,3 +142,26 @@ func (h *UserHandler) ChatBot(c *fiber.Ctx) error {
 
 	return response.SuccessBuildResponse(c, fiber.StatusOK, "Successfully retrieved chat-bot", result)
 }
+
+func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
+	currentUser, ok := c.Locals("currentUser").(*entities.UserModels)
+	if !ok || currentUser == nil {
+		return response.ErrorBuildResponse(c, fiber.StatusUnauthorized, "Unauthorized: Missing or invalid user information.")
+	}
+
+	if currentUser.Role != "admin" {
+		return response.ErrorBuildResponse(c, fiber.StatusForbidden, "Forbidden: Only admin users can access this resource.")
+	}
+	id := c.Params("id")
+	userID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusBadRequest, "Invalid input format.")
+	}
+
+	err = h.service.DeleteUser(userID)
+	if err != nil {
+		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Failed to retrieve user: "+err.Error())
+	}
+
+	return response.SuccessBuildWithoutResponse(c, fiber.StatusOK, "Success delete user")
+}
