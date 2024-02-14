@@ -8,6 +8,7 @@ import (
 	"ruti-store/module/entities"
 	"ruti-store/module/feature/user/domain"
 	assistant "ruti-store/utils/assitant"
+	"time"
 )
 
 type UserRepository struct {
@@ -101,4 +102,17 @@ func (r *UserRepository) ChatBotAI(req *domain.CreateChatBotRequest) (string, er
 	}
 
 	return "", errors.New("no response from the chatbot")
+}
+
+func (r *UserRepository) DeleteUser(userID uint64) error {
+	user := &entities.UserModels{}
+	if err := r.db.Where("id = ?", userID).First(&user).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Model(&user).Update("deleted_at", time.Now()).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
