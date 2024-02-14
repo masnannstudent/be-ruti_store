@@ -32,12 +32,7 @@ func (s *CategoryService) GetAllCategories(page, pageSize int) ([]*entities.Cate
 	return result, totalItems, nil
 }
 
-func (s *CategoryService) GetCategoriesPage(currentPage, pageSize int) (int, int, int, int, error) {
-	totalItems, err := s.repo.GetTotalItems()
-	if err != nil {
-		return 0, 0, 0, 0, err
-	}
-
+func (s *CategoryService) GetCategoryPage(currentPage, pageSize, totalItems int) (int, int, int, error) {
 	totalPages := int(math.Ceil(float64(totalItems) / float64(pageSize)))
 	nextPage := currentPage + 1
 	prevPage := currentPage - 1
@@ -50,7 +45,7 @@ func (s *CategoryService) GetCategoriesPage(currentPage, pageSize int) (int, int
 		prevPage = 0
 	}
 
-	return currentPage, totalPages, nextPage, prevPage, nil
+	return totalPages, nextPage, prevPage, nil
 }
 
 func (s *CategoryService) GetCategoryByID(categoryID uint64) (*entities.CategoryModels, error) {
@@ -110,4 +105,12 @@ func (s *CategoryService) DeleteCategory(categoryID uint64) error {
 	}
 
 	return nil
+}
+
+func (s *CategoryService) SearchProductByCategoryID(page, pageSize int, categoryID uint64) ([]*entities.ProductModels, int64, error) {
+	result, totalItems, err := s.repo.GetProductsByCategoryID(page, pageSize, categoryID)
+	if err != nil {
+		return nil, 0, err
+	}
+	return result, totalItems, nil
 }
