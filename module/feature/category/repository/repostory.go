@@ -83,3 +83,22 @@ func (r *CategoryRepository) DeleteCategory(categoryID uint64) error {
 
 	return nil
 }
+
+func (r *CategoryRepository) GetProductsByCategoryID(page, perPage int, categoryID uint64) ([]*entities.ProductModels, int64, error) {
+	var products []*entities.ProductModels
+	var totalItems int64
+
+	offset := (page - 1) * perPage
+
+	if err := r.db.Model(&entities.ProductModels{}).
+		Joins("JOIN product_categories ON product_categories.product_models_id = product.id").
+		Joins("JOIN category ON category.id = product_categories.category_models_id").
+		Preload("Photos").
+		Where("category.id = ?", categoryID).
+		Count(&totalItems).
+		Offset(offset).Limit(perPage).Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return products, totalItems, nil
+}

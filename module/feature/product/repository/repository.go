@@ -52,7 +52,10 @@ func (r *ProductRepository) GetPaginatedProducts(page, pageSize int) ([]*entitie
 func (r *ProductRepository) GetProductByID(productID uint64) (*entities.ProductModels, error) {
 	var product *entities.ProductModels
 
-	if err := r.db.Preload("Photos").Preload("Categories").Where("id = ? AND deleted_at IS NULL", productID).First(&product).Error; err != nil {
+	if err := r.db.Preload("Photos").
+		Preload("Categories", "deleted_at IS NULL").
+		Where("id = ? AND deleted_at IS NULL", productID).
+		First(&product).Error; err != nil {
 		return nil, err
 	}
 	return product, nil
