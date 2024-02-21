@@ -35,12 +35,12 @@ func ResponseDetailProducts(data *entities.ProductModels) *ProductsResponse {
 		Discount:     data.Discount,
 		Rating:       data.Rating,
 		TotalReviews: data.TotalReviews,
-		Size:         data.Size,
-		Color:        data.Color,
-		Stock:        data.Stock,
-		Weight:       data.Weight,
-		CreatedAt:    data.CreatedAt,
-		Photos:       getPhotoResponses(data.Photos),
+		//Size:         data.Size,
+		//Color:        data.Color,
+		//Stock:        data.Stock,
+		//Weight:       data.Weight,
+		CreatedAt: data.CreatedAt,
+		Photos:    getPhotoResponses(data.Photos),
 	}
 	return res
 }
@@ -57,12 +57,12 @@ func ResponseArrayProducts(data []*entities.ProductModels) []*ProductsResponse {
 			Discount:     product.Discount,
 			Rating:       product.Rating,
 			TotalReviews: product.TotalReviews,
-			Size:         product.Size,
-			Color:        product.Color,
-			Stock:        product.Stock,
-			Weight:       product.Weight,
-			CreatedAt:    product.CreatedAt,
-			Photos:       getPhotoResponses(product.Photos),
+			//Size:         product.Size,
+			//Color:        product.Color,
+			//Stock:        product.Stock,
+			//Weight:       product.Weight,
+			CreatedAt: product.CreatedAt,
+			Photos:    getPhotoResponses(product.Photos),
 		}
 		res = append(res, productRes)
 	}

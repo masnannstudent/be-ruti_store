@@ -26,7 +26,7 @@ func (r *NotificationRepository) CreateNotification(notification *entities.Notif
 
 func (r *NotificationRepository) GetNotificationUser(userID uint64) ([]*entities.NotificationModels, error) {
 	var notify []*entities.NotificationModels
-	if err := r.db.Where("user_id", userID).
+	if err := r.db.Where("user_id = ? AND deleted_at IS NULL", userID).
 		Order("created_at DESC").
 		Find(&notify).Error; err != nil {
 		return nil, err

@@ -39,4 +39,5 @@ func SetupRoutesProduct(app *fiber.App, jwt token.JWTInterface, userService user
 	api.Put("/photo/update/:id", middleware.AuthMiddleware(jwt, userService), hand.UpdatePhotoProduct)
 	api.Get("/recommendation", hand.GetProductRecommendation)
 	api.Get("/recommendation-user", hand.GetAllProductsRecommendation)
+	api.Post("/create/variant", middleware.AuthMiddleware(jwt, userService), hand.CreateVariantProduct)
 }

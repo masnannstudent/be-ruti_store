@@ -65,7 +65,7 @@ func (s *ArticleService) CreateArticle(req *domain.CreateArticleRequest) (*entit
 	newData := &entities.ArticleModels{
 		Title:     req.Title,
 		Content:   req.Content,
-		Author:    "Ruti Store",
+		Author:    "Sander'Store",
 		Photo:     req.Photo,
 		CreatedAt: time.Now(),
 	}

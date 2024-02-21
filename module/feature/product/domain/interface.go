@@ -22,6 +22,7 @@ type ProductRepositoryInterface interface {
 	GenerateRecommendationProduct() ([]string, error)
 	FindAllProductRecommendation(productsFromAI []string) ([]*entities.ProductModels, error)
 	SearchAndPaginateProducts(name string, page, pageSize int) ([]*entities.ProductModels, int64, error)
+	CreateVariantProduct(newData *entities.ProductVariantModels) (*entities.ProductVariantModels, error)
 }
 
 type ProductServiceInterface interface {
@@ -41,6 +42,7 @@ type ProductServiceInterface interface {
 	GetProductRecommendation() ([]string, error)
 	GetAllProductsRecommendation() ([]*entities.ProductModels, error)
 	SearchAndPaginateProducts(name string, page, pageSize int) ([]*entities.ProductModels, int64, error)
+	CreateVariantProduct(req *CreateVariantRequest) (*entities.ProductVariantModels, error)
 }
 
 type ProductHandlerInterface interface {
@@ -54,4 +56,5 @@ type ProductHandlerInterface interface {
 	UpdatePhotoProduct(c *fiber.Ctx) error
 	GetProductRecommendation(c *fiber.Ctx) error
 	GetAllProductsRecommendation(c *fiber.Ctx) error
+	CreateVariantProduct(c *fiber.Ctx) error
 }

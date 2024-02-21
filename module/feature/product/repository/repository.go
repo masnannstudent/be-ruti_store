@@ -332,3 +332,10 @@ func (r *ProductRepository) SearchAndPaginateProducts(name string, page, pageSiz
 
 	return products, totalItems, nil
 }
+
+func (r *ProductRepository) CreateVariantProduct(newData *entities.ProductVariantModels) (*entities.ProductVariantModels, error) {
+	if err := r.db.Create(newData).Error; err != nil {
+		return nil, err
+	}
+	return newData, nil
+}
