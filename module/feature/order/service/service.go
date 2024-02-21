@@ -93,9 +93,9 @@ func (s *OrderService) CreateOrder(userID uint64, request *domain.CreateOrderReq
 		return nil, errors.New("product not found")
 	}
 
-	if products.Stock < request.Quantity {
-		return nil, errors.New("insufficient stock for this order")
-	}
+	//if products.Stock < request.Quantity {
+	//	return nil, errors.New("insufficient stock for this order")
+	//}
 
 	var orderDetails []entities.OrderDetailsModels
 	var totalQuantity, totalPrice, totalDiscount uint64
@@ -444,9 +444,9 @@ func (s *OrderService) CreateOrderCart(userID uint64, request *domain.CreateOrde
 			return nil, errors.New("product not found")
 		}
 
-		if products.Stock < cartItem.Quantity {
-			return nil, errors.New("insufficient stock for this order")
-		}
+		//if products.Stock < cartItem.Quantity {
+		//	return nil, errors.New("insufficient stock for this order")
+		//}
 
 		orderDetail := entities.OrderDetailsModels{
 			OrderID:       orderID,

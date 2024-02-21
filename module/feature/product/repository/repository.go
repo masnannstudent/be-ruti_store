@@ -54,6 +54,7 @@ func (r *ProductRepository) GetProductByID(productID uint64) (*entities.ProductM
 
 	if err := r.db.Preload("Photos").
 		Preload("Categories", "deleted_at IS NULL").
+		Preload("Variants").
 		Where("id = ? AND deleted_at IS NULL", productID).
 		First(&product).Error; err != nil {
 		return nil, err
@@ -331,4 +332,23 @@ func (r *ProductRepository) SearchAndPaginateProducts(name string, page, pageSiz
 	}
 
 	return products, totalItems, nil
+}
+
+func (r *ProductRepository) CreateVariantProduct(newData *entities.ProductVariantModels) (*entities.ProductVariantModels, error) {
+	if err := r.db.Create(newData).Error; err != nil {
+		return nil, err
+	}
+	return newData, nil
+}
+
+func (r *ProductRepository) UpdateProductStatus(productID uint64, status string) error {
+	var existingProduct *entities.ProductModels
+	if err := r.db.Where("id = ?", productID).First(&existingProduct).Error; err != nil {
+		return err
+	}
+	if err := r.db.Model(existingProduct).Update("status", status).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

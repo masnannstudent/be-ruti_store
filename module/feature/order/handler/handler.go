@@ -419,7 +419,10 @@ func (h *OrderHandler) GetReportOrder(c *fiber.Ctx) error {
 		"Status Pembayaran", "Dibuat Pada",
 	}
 
-	title := fmt.Sprintf("Laporan Pesanan Bulan %s", startDate.Format("January 2006"))
+	title := "Laporan Penjualan"
+	companyName := "Sander'Store, "
+	companyAddress := "Purbasari RT01/RW02"
+	dateRange := fmt.Sprintf("%s - %s", startDate.Format("2 January 2006"), endDate.Format("2 January 2006"))
 
 	var data [][]interface{}
 	for _, order := range result {
@@ -439,7 +442,7 @@ func (h *OrderHandler) GetReportOrder(c *fiber.Ctx) error {
 	}
 
 	fileName := fmt.Sprintf("Laporan Penjualan_%s.xlsx", startDate.Format("January 2006"))
-	err = export.ExportXlsx(c, data, headers, title, fileName)
+	err = export.ExportXlsx(c, data, headers, title, companyName, companyAddress, dateRange, fileName)
 	if err != nil {
 		return response.ErrorBuildResponse(c, fiber.StatusInternalServerError, "Error exporting to Xlx: "+err.Error())
 	}
