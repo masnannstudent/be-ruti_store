@@ -6,24 +6,32 @@ import (
 )
 
 type ProductsResponse struct {
-	ID           uint64                 `json:"id"`
-	Name         string                 `json:"name"`
-	Price        uint64                 `json:"price"`
-	Description  string                 `json:"description"`
-	Discount     uint64                 `json:"discount"`
-	Rating       float64                `json:"rating"`
-	TotalReviews uint64                 `json:"total_reviews"`
-	Size         string                 `json:"size"`
-	Color        string                 `json:"color"`
-	Stock        uint64                 `json:"stock"`
-	Weight       uint64                 `json:"weight"`
-	CreatedAt    time.Time              `json:"created_at"`
-	Photos       []ProductPhotoResponse `json:"photos"`
+	ID           uint64                    `json:"id"`
+	Name         string                    `json:"name"`
+	Price        uint64                    `json:"price"`
+	Description  string                    `json:"description"`
+	Discount     uint64                    `json:"discount"`
+	Rating       float64                   `json:"rating"`
+	TotalReviews uint64                    `json:"total_reviews"`
+	Status       string                    `json:"status"`
+	CreatedAt    time.Time                 `json:"created_at"`
+	Photos       []ProductPhotoResponse    `json:"photos"`
+	Variants     []*VariantProductResponse `json:"variants"`
 }
 
 type ProductPhotoResponse struct {
 	ID  uint64 `json:"id"`
 	URL string `json:"url"`
+}
+
+type VariantProductResponse struct {
+	ID        uint64    `json:"id"`
+	Size      string    `json:"size"`
+	Color     string    `json:"color"`
+	Stock     uint64    `json:"stock"`
+	Weight    uint64    `json:"weight"`
+	Status    string    `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func ResponseDetailProducts(data *entities.ProductModels) *ProductsResponse {
@@ -35,14 +43,31 @@ func ResponseDetailProducts(data *entities.ProductModels) *ProductsResponse {
 		Discount:     data.Discount,
 		Rating:       data.Rating,
 		TotalReviews: data.TotalReviews,
-		//Size:         data.Size,
-		//Color:        data.Color,
-		//Stock:        data.Stock,
-		//Weight:       data.Weight,
-		CreatedAt: data.CreatedAt,
-		Photos:    getPhotoResponses(data.Photos),
+		Status:       data.Status,
+		CreatedAt:    data.CreatedAt,
+		Photos:       getPhotoResponses(data.Photos),
+		Variants:     getVariantResponses(data.Variants),
 	}
 	return res
+}
+func ResponseDetailVariantProducts(data *entities.ProductVariantModels) *VariantProductResponse {
+	res := &VariantProductResponse{
+		ID:        data.ID,
+		Size:      data.Size,
+		Color:     data.Color,
+		Stock:     data.Stock,
+		Weight:    data.Weight,
+		CreatedAt: data.CreatedAt,
+	}
+	return res
+}
+
+func getVariantResponses(variants []entities.ProductVariantModels) []*VariantProductResponse {
+	variantResponses := make([]*VariantProductResponse, len(variants))
+	for i, variant := range variants {
+		variantResponses[i] = ResponseDetailVariantProducts(&variant)
+	}
+	return variantResponses
 }
 
 func ResponseArrayProducts(data []*entities.ProductModels) []*ProductsResponse {
@@ -57,12 +82,9 @@ func ResponseArrayProducts(data []*entities.ProductModels) []*ProductsResponse {
 			Discount:     product.Discount,
 			Rating:       product.Rating,
 			TotalReviews: product.TotalReviews,
-			//Size:         product.Size,
-			//Color:        product.Color,
-			//Stock:        product.Stock,
-			//Weight:       product.Weight,
-			CreatedAt: product.CreatedAt,
-			Photos:    getPhotoResponses(product.Photos),
+			Status:       product.Status,
+			CreatedAt:    product.CreatedAt,
+			Photos:       getPhotoResponses(product.Photos),
 		}
 		res = append(res, productRes)
 	}

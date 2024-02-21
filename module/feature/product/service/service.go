@@ -244,3 +244,15 @@ func (s *ProductService) CreateVariantProduct(req *domain.CreateVariantRequest) 
 	}
 	return result, nil
 }
+
+func (s *ProductService) UpdateStatusProduct(req *domain.UpdateStatusRequest) error {
+	products, err := s.repo.GetProductByID(req.ProductID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	if err := s.repo.UpdateProductStatus(products.ID, req.Status); err != nil {
+		return err
+	}
+	return nil
+}

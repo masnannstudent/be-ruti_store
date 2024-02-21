@@ -34,3 +34,8 @@ type CreateVariantRequest struct {
 	Weight    uint64 `json:"weight"`
 	Stock     uint64 `json:"stock"`
 }
+
+type UpdateStatusRequest struct {
+	ProductID uint64 `json:"product_id" validate:"required"`
+	Status    string `json:"status" validate:"required"`
+}

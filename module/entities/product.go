@@ -10,6 +10,7 @@ type ProductModels struct {
 	Discount     uint64                 `gorm:"column:discount" json:"discount"`
 	Rating       float64                `gorm:"column:rating" json:"rating"`
 	TotalReviews uint64                 `gorm:"column:total_reviews" json:"total_reviews"`
+	Status       string                 `gorm:"column:status;type:VARCHAR(255)" json:"status"`
 	CreatedAt    time.Time              `gorm:"column:created_at;type:timestamp" json:"created_at"`
 	UpdatedAt    time.Time              `gorm:"column:updated_at;type:timestamp" json:"updated_at"`
 	DeletedAt    *time.Time             `gorm:"column:deleted_at;type:TIMESTAMP NULL;index" json:"deleted_at"`
