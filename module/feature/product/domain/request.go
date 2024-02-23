@@ -5,6 +5,7 @@ type CreateProductRequest struct {
 	Price       uint64   `json:"price" validate:"required"`
 	Description string   `json:"description" validate:"required"`
 	Discount    uint64   `json:"discount"`
+	Status      string   `json:"status"`
 	CategoryID  []uint64 `json:"category_id" validate:"required"`
 }
 

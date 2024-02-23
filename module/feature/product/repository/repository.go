@@ -192,17 +192,17 @@ func (r *ProductRepository) UpdateProductPhoto(productID uint64, newPhotoURL str
 	return nil
 }
 
-func (r *ProductRepository) ReduceStockWhenPurchasing(productID, quantity uint64) error {
-	var products entities.ProductModels
-	if err := r.db.Model(&products).Where("id = ?", productID).Update("stock", gorm.Expr("stock - ?", quantity)).Error; err != nil {
+func (r *ProductRepository) ReduceStockWhenPurchasing(variantID, quantity uint64) error {
+	var variant entities.ProductVariantModels
+	if err := r.db.Model(&variant).Where("id = ?", variantID).Update("stock", gorm.Expr("stock - ?", quantity)).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *ProductRepository) IncreaseStock(productID, quantity uint64) error {
-	var products entities.ProductModels
-	if err := r.db.Model(&products).Where("id = ?", productID).Update("stock", gorm.Expr("stock + ?", quantity)).Error; err != nil {
+func (r *ProductRepository) IncreaseStock(variantID, quantity uint64) error {
+	var variant entities.ProductVariantModels
+	if err := r.db.Model(&variant).Where("id = ?", variantID).Update("stock", gorm.Expr("stock + ?", quantity)).Error; err != nil {
 		return err
 	}
 	return nil

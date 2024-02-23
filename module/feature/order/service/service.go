@@ -93,10 +93,6 @@ func (s *OrderService) CreateOrder(userID uint64, request *domain.CreateOrderReq
 		return nil, errors.New("product not found")
 	}
 
-	//if products.Stock < request.Quantity {
-	//	return nil, errors.New("insufficient stock for this order")
-	//}
-
 	var orderDetails []entities.OrderDetailsModels
 	var totalQuantity, totalPrice, totalDiscount uint64
 
@@ -152,8 +148,13 @@ func (s *OrderService) CreateOrder(userID uint64, request *domain.CreateOrderReq
 		return nil, err
 	}
 
-	if err := s.productService.ReduceStockWhenPurchasing(request.ProductID, request.Quantity); err != nil {
-		return nil, errors.New("failed reduce stock")
+	for _, variant := range products.Variants {
+		if variant.Size == request.Size && variant.Color == request.Color {
+			if err := s.productService.ReduceStockWhenPurchasing(variant.ID, request.Quantity); err != nil {
+				return nil, errors.New("failed reduce stock for variant")
+			}
+			break
+		}
 	}
 
 	notificationRequest := domain.CreateNotificationPaymentRequest{
@@ -444,10 +445,6 @@ func (s *OrderService) CreateOrderCart(userID uint64, request *domain.CreateOrde
 			return nil, errors.New("product not found")
 		}
 
-		//if products.Stock < cartItem.Quantity {
-		//	return nil, errors.New("insufficient stock for this order")
-		//}
-
 		orderDetail := entities.OrderDetailsModels{
 			OrderID:       orderID,
 			ProductID:     products.ID,
@@ -465,8 +462,13 @@ func (s *OrderService) CreateOrderCart(userID uint64, request *domain.CreateOrde
 
 		orderDetails = append(orderDetails, orderDetail)
 
-		if err := s.productService.ReduceStockWhenPurchasing(products.ID, cartItem.Quantity); err != nil {
-			return nil, errors.New("failed reduce stock")
+		for _, variant := range products.Variants {
+			if variant.Size == cartItem.Size && variant.Color == cartItem.Color {
+				if err := s.productService.ReduceStockWhenPurchasing(variant.ID, cartItem.Quantity); err != nil {
+					return nil, errors.New("failed reduce stock for variant")
+				}
+				break
+			}
 		}
 	}
 
