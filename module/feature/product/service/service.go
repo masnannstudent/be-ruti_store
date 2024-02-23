@@ -62,10 +62,7 @@ func (s *ProductService) CreateProduct(req *domain.CreateProductRequest) (*entit
 		Price:       req.Price,
 		Description: req.Description,
 		Discount:    req.Discount,
-		Size:        req.Size,
-		Color:       req.Color,
-		Stock:       req.Stock,
-		Weight:      req.Weight,
+		Status:      req.Status,
 		CreatedAt:   time.Now(),
 	}
 
@@ -87,10 +84,6 @@ func (s *ProductService) UpdateProduct(productID uint64, req *domain.UpdateProdu
 		Price:       req.Price,
 		Description: req.Description,
 		Discount:    req.Discount,
-		Size:        req.Size,
-		Color:       req.Color,
-		Stock:       req.Stock,
-		Weight:      req.Weight,
 		UpdatedAt:   time.Now(),
 	}
 
@@ -186,9 +179,9 @@ func (s *ProductService) ReduceStockWhenPurchasing(productID, quantity uint64) e
 		return errors.New("product not found")
 	}
 
-	if products.Stock < quantity {
-		return errors.New("stock not enough")
-	}
+	//if products.Stock < quantity {
+	//	return errors.New("stock not enough")
+	//}
 
 	if err := s.repo.ReduceStockWhenPurchasing(products.ID, quantity); err != nil {
 		return err
@@ -236,4 +229,31 @@ func (s *ProductService) SearchAndPaginateProducts(name string, page, pageSize i
 		return nil, 0, err
 	}
 	return result, totalItems, nil
+}
+
+func (s *ProductService) CreateVariantProduct(req *domain.CreateVariantRequest) (*entities.ProductVariantModels, error) {
+	newData := &entities.ProductVariantModels{
+		ProductID: req.ProductID,
+		Size:      req.Size,
+		Color:     req.Color,
+		Stock:     req.Stock,
+		Weight:    req.Weight,
+	}
+	result, err := s.repo.CreateVariantProduct(newData)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (s *ProductService) UpdateStatusProduct(req *domain.UpdateStatusRequest) error {
+	products, err := s.repo.GetProductByID(req.ProductID)
+	if err != nil {
+		return errors.New("product not found")
+	}
+
+	if err := s.repo.UpdateProductStatus(products.ID, req.Status); err != nil {
+		return err
+	}
+	return nil
 }
