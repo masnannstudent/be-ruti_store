@@ -62,6 +62,7 @@ func (s *ProductService) CreateProduct(req *domain.CreateProductRequest) (*entit
 		Price:       req.Price,
 		Description: req.Description,
 		Discount:    req.Discount,
+		Status:      req.Status,
 		CreatedAt:   time.Now(),
 	}
 
